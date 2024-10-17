@@ -1,5 +1,6 @@
-from utils import get_data_type, get_snapshot
-
+from .utils import get_data_type, get_snapshot, get_close
+from pandas import to_datetime
+from decimal import Decimal
 
 
 class Frame:
@@ -9,9 +10,11 @@ class Frame:
         self.code = None
         self.data_type = None
         self.category = None
-        self.timestamp = None
-        self.simtrade = None
         self.is_snapshot = None
+        self.timestamp = None
+
+        # None for snapshot
+        self.simtrade = None
 
         # tick attributes
         self.price = None
@@ -21,7 +24,7 @@ class Frame:
         self.best_ask = None
 
         # future option attributes
-        self.underlying_price = None
+        self.underlying_price = None  # none for snapshot
 
         # Other attributes
         self.close = None
@@ -39,14 +42,29 @@ class Frame:
             snapshot = get_snapshot(api, code, category)
             self.data_to_frame(snapshot)
 
+    def __iter__(self):
+        yield 'code', self.code
+        yield 'data_type', self.data_type
+        yield 'category', self.category
+        yield 'is_snapshot', self.is_snapshot
+        yield 'timestamp', self.timestamp
+        yield 'simtrade', self.simtrade
+        yield 'price', self.price
+        yield 'best_bid', self.best_bid
+        yield 'best_ask', self.best_ask
+        yield 'underlying_price', self.underlying_price
+        yield 'close', self.close
+        yield 'price_pct_chg', self.price_pct_chg
+        yield 'bid_pct_chg', self.bid_pct_chg
+        yield 'ask_pct_chg', self.ask_pct_chg
+
+
     def data_to_frame(self, data):
         self.code = data.code
         data_type, category = get_data_type(data)
         self.data_type = data_type
         self.category = category
-        self.timestamp = data.timestamp
-        self.simtrade = data.simtrade
-        if category == 'fop':
+        if category == 'fop' and data_type != 'snapshot':
             self.underlying_price = data.underlying_price
         if data_type == 'snapshot':
             self.is_snapshot = True
@@ -58,26 +76,37 @@ class Frame:
             self._bidask_to_frame(data)
         if data_type == 'quote':
             self._quote_to_frame(data)
+        if data_type == 'snapshot':
+            self._snapshot_to_frame(data)
+        # self.update_close()
+
+    def _snapshot_to_frame(self, snapshot):
+        self.price = round(Decimal(snapshot.close), 2)
+        self.timestamp = to_datetime(snapshot.ts)
 
     def _tick_to_frame(self, tick):
         self.price = tick.close
-        self.update_pct()
+        self.simtrade = tick.simtrade
+        self.update_pct_chg()
 
     def _bidask_to_frame(self, bidask):
+        self.simtrade = bidask.simtrade
         self.best_bid = bidask.bid_price[0]
         self.best_ask = bidask.ask_price[0]
-    
+
     def _quote_to_frame(self, quote):
         self._tick_to_frame(quote)
         self._bidask_to_frame(quote)
 
     def update_pct_chg(self):
         if self.close is not None:
-            self.price_pct_chg = (self.price - self.close) / self.close * 100
+            self.price_pct_chg = round((self.price - self.close) / self.close * 100, 2)
             if self.best_bid is not None:
-                self.bid_pct_chg = (self.best_bid - self.close) / self.close * 100
+                self.bid_pct_chg = round((self.best_bid - self.close) / self.close * 100, 2)
             if self.best_ask is not None:
-                self.ask_pct_chg = (self.best_ask - self.close) / self.close * 100
-    
+                self.ask_pct_chg = round((self.best_ask - self.close) / self.close * 100, 2)
+
     def update_close(self):
-        raise NotImplementedError("Method update_close is not implemented")
+        close = get_close(self.api, self.code, self.category, sync=True)
+        self.close = round(Decimal(close), 2)
+        self.update_pct_chg()
