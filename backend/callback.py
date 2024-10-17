@@ -72,11 +72,11 @@ class CallbackManager:
             callback = callback_data[0]
             args = callback_data[1]['args']
             kwargs = callback_data[1]['kwargs']
-            kwargs['_data_manager'] = data_manager
             if iscoroutinefunction(callback):
-                self.loop.create_task(callback(args, kwargs))
+                self.loop.create_task(callback(self.api, data_manager, args, kwargs))
             else:
                 try:
-                    self.loop.run_in_executor(None, callback, args, kwargs)
+                    self.loop.run_in_executor(None,callback, self.api,
+                                              self.data_manager, args, kwargs)
                 except KeyboardInterrupt:
                     self.loop.stop()
