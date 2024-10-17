@@ -103,5 +103,5 @@ class DataManager:
         self.storage[code][category][data_type].append(data)
 
     def __is_empty(self, code: str, category: str, data_type: str):
-        return code not in self.subscribed[category][data_type] and \
+        return code not in self.subscribed[category][data_type] or \
                len(self.storage[code][category][data_type]) == 0
