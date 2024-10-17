@@ -33,10 +33,6 @@ class CallbackManager:
             }
         )
 
-    def __is_empty(self, code: str, category: str, data_type: str):
-        return code not in self.callbacks[category][data_type] and \
-                len(self.callbacks[code][category][data_type]) == 0
-
     def remove_callback(self, code: str,
                         category: str,
                         data_type: str,
@@ -56,7 +52,6 @@ class CallbackManager:
                      callback,
                      *args,
                      **kwargs):
-        callback
         callback_args = {
             'args': args,
             'kwargs': kwargs
@@ -77,6 +72,6 @@ class CallbackManager:
             else:
                 try:
                     self.loop.run_in_executor(None,callback, self.api,
-                                              self.data_manager, args, kwargs)
+                                              data_manager, args, kwargs)
                 except KeyboardInterrupt:
                     self.loop.stop()
