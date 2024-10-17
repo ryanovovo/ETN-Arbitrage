@@ -1,9 +1,9 @@
+import asyncio
+import logging
 from backend.quote import QuoteManager
 from backend.utils import get_api, get_nearmonth_future_code
 from backend.frame import Frame
 from backend.state import State
-import asyncio
-import logging
 from backend.callback_functions import callback_tx_tick, callback_tx_bidask, callback_etn
 
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
