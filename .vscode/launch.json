@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "type": "debugpy",
+            "request": "launch",
+            "name": "Launch Main",
+            "program": "${workspaceFolder}/${input:programPath}",
+            "console": "integratedTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "type": "pickString",
+            "id": "programPath",
+            "description": "Select the main program to launch",
+            "options": [
+                "main.py",
+                "backend/callback_functions.py",
+                "backend/callback.py",
+                "backend/data.py",
+                "backend/frame.py",
+                "backend/quote.py",
+                "backend/state.py",
+                "backend/utils.py"
+            ]
+        }
+    ]
+}
