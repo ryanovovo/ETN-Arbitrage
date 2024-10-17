@@ -40,7 +40,7 @@ class Frame:
             if category is None:
                 raise ValueError("Category is required for snapshot initialization")
             snapshot = get_snapshot(api, code, category)
-            self.data_to_frame(snapshot)
+            self.update_frame(snapshot)
 
     def __iter__(self):
         yield 'code', self.code
@@ -59,7 +59,7 @@ class Frame:
         yield 'ask_pct_chg', self.ask_pct_chg
 
 
-    def data_to_frame(self, data):
+    def update_frame(self, data):
         self.code = data.code
         data_type, category = get_data_type(data)
         self.data_type = data_type
