@@ -45,33 +45,24 @@ def get_nearmonth_future_code(api, code: str):
 
 
 def get_data_type(data):
-    data_type = None
-    category = None
     if isinstance(data, TickSTKv1):
-        data_type = 'tick'
-        category = 'stk'
+        return 'tick', 'stk'
     if isinstance(data, TickFOPv1):
-        data_type = 'tick'
-        category = 'fop'
+        return 'tick', 'fop'
     if isinstance(data, BidAskSTKv1):
-        data_type = 'bidask'
-        category = 'stk'
+        return 'bidask', 'stk'
     if isinstance(data, BidAskFOPv1):
-        data_type = 'bidask'
-        category = 'fop'
+        return 'bidask', 'fop'
     if isinstance(data, QuoteSTKv1):
-        data_type = 'quote'
-        category = 'stk'
+        return 'quote', 'stk'
     if isinstance(data, Snapshot):
         if data['exchange'] == 'TSE':
-            data_type = 'snapshot'
-            category = 'stk'
+            return 'snapshot', 'stk'
         elif data['exchange'] == 'TAIFEX':
-            data_type = 'snapshot'
-            category = 'fop'
+            return 'snapshot', 'fop'
         else:
             raise ValueError(f"Invalid exchange: {data['exchange']}")
-    return data_type, category
+    raise ValueError(f"Invalid data type: {data}")
 
 
 def get_nearest_fullday_kbar(api, code: str, category: str, max_try_days: int = 10):
