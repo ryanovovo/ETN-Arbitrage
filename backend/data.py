@@ -4,7 +4,7 @@ from shioaji.backend.solace.tick import TickSTKv1, TickFOPv1
 from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
 from shioaji.backend.solace.quote import QuoteSTKv1
 from shioaji.data import Snapshot
-from utils import get_snapshot
+from .utils import get_snapshot
 
 
 class DataManager:
