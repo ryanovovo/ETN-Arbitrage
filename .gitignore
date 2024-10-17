@@ -8,3 +8,6 @@ logs/shioaji.log
 test/shioaji.log
 shioaji.log
 test/test.ipynb
+backend/__pycache__/callback_functions.cpython-312.pyc
+backend/__pycache__/frame.cpython-312.pyc
+backend/__pycache__/state.cpython-312.pyc
