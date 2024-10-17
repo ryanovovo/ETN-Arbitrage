@@ -76,4 +76,7 @@ class CallbackManager:
             if iscoroutinefunction(callback):
                 self.loop.create_task(callback(args, kwargs))
             else:
-                self.loop.run_in_executor(None, callback, args, kwargs)
+                try:
+                    self.loop.run_in_executor(None, callback, args, kwargs)
+                except KeyboardInterrupt:
+                    self.loop.stop()
