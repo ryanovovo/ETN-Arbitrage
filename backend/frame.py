@@ -85,18 +85,24 @@ class Frame:
         self.timestamp = to_datetime(snapshot.ts)
 
     def _tick_to_frame(self, tick):
-        self.price = tick.close
+        self.timestamp = tick.datetime
         self.simtrade = tick.simtrade
+        self.price = tick.close
         self.update_pct_chg()
 
     def _bidask_to_frame(self, bidask):
+        self.timestamp = bidask.datetime
         self.simtrade = bidask.simtrade
         self.best_bid = bidask.bid_price[0]
         self.best_ask = bidask.ask_price[0]
 
     def _quote_to_frame(self, quote):
-        self._tick_to_frame(quote)
-        self._bidask_to_frame(quote)
+        self.timestamp = quote.datetime
+        self.simtrade = quote.simtrade
+        self.price = quote.close
+        self.best_bid = quote.bid_price[0]
+        self.best_ask = quote.ask_price[0]
+        self.update_pct_chg
 
     def update_pct_chg(self):
         if self.close is not None:
