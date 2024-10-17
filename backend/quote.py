@@ -3,7 +3,6 @@ from data import DataManager
 import asyncio
 
 
-
 class QuoteManager:
     def __init__(self,
                  api,
@@ -71,7 +70,8 @@ class QuoteManager:
                      callback,
                      *args,
                      **kwargs):
-        self.callback_manager.add_callback(code,category, 
+        self.callback_manager.add_callback(code,
+                                           category,
                                            data_type,
                                            callback,
                                            *args,
