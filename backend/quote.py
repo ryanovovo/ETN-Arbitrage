@@ -1,6 +1,6 @@
-from .callback import CallbackManager
-from .data import DataManager
 import asyncio
+from backend.callback import CallbackManager
+from backend.data import DataManager
 
 
 class QuoteManager:
