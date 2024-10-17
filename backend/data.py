@@ -1,10 +1,7 @@
 from collections import deque, defaultdict
 from typing import Optional
-from shioaji.backend.solace.tick import TickSTKv1, TickFOPv1
-from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
-from shioaji.backend.solace.quote import QuoteSTKv1
-from shioaji.data import Snapshot
-from .utils import get_snapshot
+from backend.utils import get_snapshot
+from backend.utils import get_data_type
 
 
 class DataManager:
@@ -55,7 +52,7 @@ class DataManager:
         self.storage[code][category][data_type].clear()
 
     def add_data(self, data):
-        data_type, category = self.__get_data_type(data)
+        data_type, category = get_data_type(data)
         code = data.code
         self.__add_data(code, category, data_type, data)
 
@@ -90,35 +87,13 @@ class DataManager:
         if self.__is_empty(code, category, data_type):
             if snapshot:
                 return self.storage[code][category]['snapshot'][-1]
-            else:
-                raise ValueError(
-                    f"Code {code} has no {category} {data_type} data"
-                )
+            raise ValueError(
+                f"Code {code} has no {category} {data_type} data"
+            )
         return self.storage[code][category][data_type][-1]
 
     def __is_subscribed(self, code: str, category: str, data_type: str):
         return code in self.subscribed[category][data_type]
-
-    def __get_data_type(self, data):
-        if isinstance(data, TickSTKv1):
-            return 'tick', 'stk'
-        elif isinstance(data, TickFOPv1):
-            return 'tick', 'fop'
-        elif isinstance(data, BidAskSTKv1):
-            return 'bidask', 'stk'
-        elif isinstance(data, BidAskFOPv1):
-            return 'bidask', 'fop'
-        elif isinstance(data, QuoteSTKv1):
-            return 'quote', 'stk'
-        elif isinstance(data, Snapshot):
-            if data['exchange'] == 'TSE':
-                return 'snapshot', 'stk'
-            elif data['exchange'] == 'TFE':
-                return 'snapshot', 'fop'
-            else:
-                raise ValueError(f"Invalid exchange: {data['exchange']}")
-        else:
-            raise ValueError(f"Invalid data type: {type(data)}")
 
     def __add_data(self, code: str, category: str, data_type: str, data):
         if not self.__is_subscribed(code, category, data_type):
