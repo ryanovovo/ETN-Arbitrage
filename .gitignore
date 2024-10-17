@@ -1,0 +1,9 @@
+.DS_Store
+.env
+backend/__pycache__/callback.cpython-312.pyc
+backend/__pycache__/data.cpython-312.pyc
+backend/__pycache__/quote.cpython-312.pyc
+backend/__pycache__/utils.cpython-312.pyc
+logs/shioaji.log
+test/shioaji.log
+shioaji.log
