@@ -5,6 +5,9 @@ from backend.utils import get_api, get_nearmonth_future_code
 from backend.frame import Frame
 from backend.state import State
 from backend.callback_functions import callback_tx_tick, callback_tx_bidask, callback_etn
+from frontend.webhook import WebhookManager
+from backend.arbitrage import Arbitrage
+from frontend.message import arbitrage_to_embed
 
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s')
@@ -22,11 +25,16 @@ future_frame.update_close()
 state = State()
 state.add_frame(etn_frame)
 state.add_frame(future_frame)
+webhook_manager = WebhookManager()
+arbitrage = Arbitrage(stock_frame=etn_frame, future_frame=future_frame)
 
 quote_manager.subscribe(nearmonth_future_code, 'fop', 'tick')
 quote_manager.subscribe(nearmonth_future_code, 'fop', 'bidask')
-quote_manager.add_callback(nearmonth_future_code, 'fop', 'tick', callback_tx_tick, state=state)
-quote_manager.add_callback(nearmonth_future_code, 'fop', 'bidask', callback_tx_bidask, state=state)
+quote_manager.add_callback(nearmonth_future_code, 'fop', 'tick', callback_tx_tick, state=state, webhook_manager=webhook_manager, arbitrage=arbitrage)
+quote_manager.add_callback(nearmonth_future_code, 'fop', 'bidask', callback_tx_bidask, state=state, webhook_manager=webhook_manager, arbitrage=arbitrage)
 quote_manager.subscribe('020039', 'stk', 'quote')
-quote_manager.add_callback('020039', 'stk', 'quote', callback_etn, state=state)
+quote_manager.add_callback('020039', 'stk', 'quote', callback_etn, state=state, webhook_manager=webhook_manager, arbitrage=arbitrage)
+
 loop.run_forever()
+
+
