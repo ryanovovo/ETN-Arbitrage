@@ -1,6 +1,6 @@
-from .utils import get_data_type, get_snapshot, get_close
-from pandas import to_datetime
 from decimal import Decimal
+from pandas import to_datetime
+from backend.utils import get_data_type, get_snapshot, get_close
 
 
 class Frame:
