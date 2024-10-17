@@ -1,5 +1,5 @@
-from callback import CallbackManager
-from data import DataManager
+from .callback import CallbackManager
+from .data import DataManager
 import asyncio
 
 
