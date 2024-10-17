@@ -1,14 +1,14 @@
 import logging
-import shioaji as sj
 import os
+from datetime import datetime, timedelta, time
+import pytz
+import pandas as pd
+import shioaji as sj
 from dotenv import load_dotenv
 from shioaji.backend.solace.tick import TickSTKv1, TickFOPv1
 from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
 from shioaji.backend.solace.quote import QuoteSTKv1
 from shioaji.data import Snapshot
-import pandas as pd
-from datetime import datetime, timedelta, time
-import pytz
 
 
 def get_api():
@@ -45,31 +45,40 @@ def get_nearmonth_future_code(api, code: str):
 
 
 def get_data_type(data):
+    data_type = None
+    category = None
     if isinstance(data, TickSTKv1):
-        return 'tick', 'stk'
-    elif isinstance(data, TickFOPv1):
-        return 'tick', 'fop'
-    elif isinstance(data, BidAskSTKv1):
-        return 'bidask', 'stk'
-    elif isinstance(data, BidAskFOPv1):
-        return 'bidask', 'fop'
-    elif isinstance(data, QuoteSTKv1):
-        return 'quote', 'stk'
-    elif isinstance(data, Snapshot):
+        data_type = 'tick'
+        category = 'stk'
+    if isinstance(data, TickFOPv1):
+        data_type = 'tick'
+        category = 'fop'
+    if isinstance(data, BidAskSTKv1):
+        data_type = 'bidask'
+        category = 'stk'
+    if isinstance(data, BidAskFOPv1):
+        data_type = 'bidask'
+        category = 'fop'
+    if isinstance(data, QuoteSTKv1):
+        data_type = 'quote'
+        category = 'stk'
+    if isinstance(data, Snapshot):
         if data['exchange'] == 'TSE':
-            return 'snapshot', 'stk'
+            data_type = 'snapshot'
+            category = 'stk'
         elif data['exchange'] == 'TAIFEX':
-            return 'snapshot', 'fop'
+            data_type = 'snapshot'
+            category = 'fop'
         else:
             raise ValueError(f"Invalid exchange: {data['exchange']}")
-    else:
-        raise ValueError(f"Invalid data type: {type(data)}")
+    return data_type, category
 
 
 def get_nearest_fullday_kbar(api, code: str, category: str, max_try_days: int = 10):
     taipei_tz = pytz.timezone('Asia/Taipei')
     stock_market_close = time(13, 30)
     future_market_close = time(13, 45)
+    contract = None
     if category == 'stk':
         contract = api.Contracts.Stocks[code]
     elif category == 'fop':
