@@ -13,6 +13,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 import os
 from dotenv import load_dotenv
+import signal
 
 # 設定日誌
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
@@ -61,10 +62,16 @@ class MyView(View):
         used_mib = round(Decimal(usage['bytes']) / 1024 / 1024, 2)
         remaining_mib = round(Decimal(usage['remaining_bytes']) / 1024 / 1024, 2)
         used_pct = round(usage['bytes'] / usage['limit_bytes'] * 100, 2)
-        unused_pct = 100 - used_pct
+        unused_pct = round(Decimal(100 - used_pct), 2)
         
         # 創建嵌入訊息
-        embed = discord.Embed(title="API使用量", color=0x00FF00)
+        if unused_pct >= 50:
+            color = discord.Color.green()
+        elif unused_pct >= 20:
+            color = discord.Color.orange()
+        else:
+            color = discord.Color.red()
+        embed = discord.Embed(title="API使用量", color=color)
         embed.add_field(name='已使用比例', value=str(used_pct)+'%', inline=False)
         embed.add_field(name='剩餘比例', value=str(unused_pct)+'%', inline=True)
         embed.add_field(name='已使用流量', value=f"{used_mib} MiB", inline=True)
@@ -87,7 +94,7 @@ class MyView(View):
         if not is_subscribed:
             quote_manager.subscribe(future_code, 'fop', 'tick')
             quote_manager.subscribe(future_code, 'fop', 'bidask')
-            quote_manager.subscribe('020039', 'stk', 'quote')
+            quote_manager.subscribe(stock_code, 'stk', 'quote')
             embed = discord.Embed(title="已訂閱！", color=0x00FF00)
             if last_message:
                 await last_message.edit(content="", embed=embed, view=self)
@@ -107,7 +114,7 @@ class MyView(View):
         if is_subscribed:
             quote_manager.unsubscribe(future_code, 'fop', 'tick')
             quote_manager.unsubscribe(future_code, 'fop', 'bidask')
-            quote_manager.unsubscribe('020039', 'stk', 'quote')
+            quote_manager.unsubscribe(stock_code, 'stk', 'quote')
             embed = discord.Embed(title="已取消訂閱！", color=0xFF0000)
             if last_message:
                 await last_message.edit(content="", embed=embed, view=self)
@@ -152,6 +159,8 @@ async def on_ready():
 load_dotenv()
 channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
 bot_token = os.getenv('DISCORD_BOT_TOKEN')
+
+loop.add_signal_handler(signal.SIGINT, loop.stop)
 
 # 啟動機器人並將其綁定到事件循環
 loop.create_task(bot.start(bot_token))
