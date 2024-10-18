@@ -32,6 +32,6 @@ def callback_tx_bidask(api, data_manager, args, kwargs):
     nearmonth_future_code = get_nearmonth_future_code(api, 'TXFR1')
     stock_data = data_manager.get_latest_data('020039', 'stk', 'quote')
     future_data = data_manager.get_latest_data(nearmonth_future_code, 'fop', 'bidask')
-    future_frame = kwargs['state'].future_frame
     update(kwargs, stock_data, future_data)
-    pprint(json.dumps(future_data.to_dict(raw=True)), sort_dicts=False)
+    future_frame = kwargs['state'].future_frame
+    # pprint(dict(future_frame), sort_dicts=False)
