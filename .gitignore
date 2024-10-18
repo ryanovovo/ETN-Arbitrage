@@ -17,3 +17,5 @@ data/020039_2024-10-17.csv
 data/TXFR1_2024-10-17.csv
 frontend/__pycache__/message.cpython-312.pyc
 frontend/__pycache__/webhook.cpython-312.pyc
+backend/__pycache__/data_redis.cpython-312.pyc
+backend/__pycache__/serial.cpython-312.pyc
