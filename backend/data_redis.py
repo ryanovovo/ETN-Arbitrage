@@ -12,7 +12,7 @@ class DataManager:
         self.api = api
         self.max_data_size = max_data_size
         # self.redis_server_path = '/opt/homebrew/opt/redis/bin/redis-server'
-        self.redis_config_path = '/opt/homebrew/etc/redis.conf'
+        self.redis_config_path = './redis.conf'
         redis_subprocess = subprocess.Popen(['redis-server', self.redis_config_path])
         self.r = None
         while self.r is None:
