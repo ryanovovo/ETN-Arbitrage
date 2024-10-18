@@ -4,6 +4,7 @@ import redis
 import subprocess
 from backend.serial import serialize, deserialize
 import time
+import logging
 import signal
 
 class DataManager:
@@ -22,7 +23,6 @@ class DataManager:
                 # 如果连接失败，等待一段时间后重试
                 time.sleep(1)  # 每次等待 1 秒钟
         self.r.flushdb()
-        signal.signal(signal.SIGINT, self.__handle_sigint)
 
     def subscribe(self, code: str, category: str, data_type: str):
         if self.__is_subscribed(code, category, data_type):
@@ -45,7 +45,12 @@ class DataManager:
         subscribed_key = f"subscribed:{category}:{data_type}"
         assert self.r.srem(subscribed_key, code) == 1
         storage_key = f"storage:{code}:{category}:{data_type}"
-        assert self.r.delete(storage_key) == 1
+        if self.r.delete(storage_key) == 0:
+            logging.warning(
+                f"Failed to delete {category} {data_type} data for code {code} maybe no incoming stream"
+            )
+        # snapshot_key = f"storage:{code}:{category}:{'snapshot'}"
+        # self.r.delete(snapshot_key)
 
     def add_data(self, data):
         data_type, category = get_data_type(data)
@@ -116,13 +121,6 @@ class DataManager:
         storage_key = f"storage:{code}:{category}:{data_type}"
         return not self.r.exists(storage_key)
     
-    def __handle_sigint(self, signum, frame):
-        print("Received Ctrl+C, shutting down Redis...")
-        # 終止 redis-server
-        self.r.terminate()
-        try:
-            self.r.wait(timeout=5)  # 等待redis進程停止
-            print("Redis server stopped.")
-        except subprocess.TimeoutExpired:
-            print("Force killing Redis server.")
-            self.r.kill()  # 強制終止
+    def shutdown_redis(self):
+        self.r.shutdown()
+        self.r = None
