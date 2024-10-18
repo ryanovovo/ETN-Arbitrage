@@ -1,6 +1,7 @@
 import asyncio
 from backend.callback import CallbackManager
-from backend.data import DataManager
+from backend.data_redis import DataManager
+import logging
 
 
 class QuoteManager:
@@ -51,6 +52,7 @@ class QuoteManager:
             raise ValueError(f"Invalid category: {category}")
         self.api.quote.subscribe(contract, data_type)
         self.data_manager.subscribe(code, category, data_type)
+        logging.info(f"Subscribed to {category} {data_type} {code}")
 
     def unsubscribe(self, code: str, category: str, data_type: str):
         if category == 'stk':
@@ -62,6 +64,7 @@ class QuoteManager:
             raise ValueError(f"Invalid category: {category}")
         self.api.quote.unsubscribe(contract, data_type)
         self.data_manager.unsubscribe(code, category, data_type)
+        logging.info(f"Unsubscribed from {category} {data_type} {code}")
 
     def add_callback(self,
                      code: str,
