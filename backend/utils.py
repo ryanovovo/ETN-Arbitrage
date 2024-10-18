@@ -79,17 +79,17 @@ def get_nearest_fullday_kbar(api, code: str, category: str, max_try_days: int = 
     now = datetime.now(taipei_tz)
     for i in range(max_try_days):
         date = now - timedelta(days=i)
+        if date == now and date.time() <= stock_market_close and category == 'stk':
+            continue
+        if date == now and date.time() <= future_market_close and category == 'fop':
+            continue
         date_str = date.strftime('%Y-%m-%d')
         kbars = api.kbars(contract, start=date_str, end=date_str)
         logging.info(f"Fetching kbars for {category} {code} on {date_str}")
         kbars_df = pd.DataFrame({**kbars})
         kbars_df.ts = pd.to_datetime(kbars_df.ts)
-        if category == 'stk':
-            if not kbars_df[kbars_df.ts.dt.time == stock_market_close].empty:
-                return kbars_df
-        elif category == 'fop':
-            if not kbars_df[kbars_df.ts.dt.time == future_market_close].empty:
-                return kbars_df
+        if kbars_df is not None:
+            return kbars_df[kbars_df.ts.dt.time <= stock_market_close]
     raise ValueError(f"Failed to fetch kbars for {category} {code}")
 
 
@@ -98,9 +98,9 @@ def get_close(api, code, category, sync=False):
     future_market_close = time(13, 45)
     kbars = get_nearest_fullday_kbar(api, code, category)
     if category == 'stk' or sync:
-        close = kbars[kbars.ts.dt.time == stock_market_close].Close.iloc[0]
+        close = kbars.Close.iloc[-1]
     elif category == 'fop':
-        close = kbars[kbars.ts.dt.time == future_market_close].Close.iloc[0]
+        close = kbars.Close.iloc[-1]
     else:
         raise ValueError(f"Invalid category: {category}")
     return close
