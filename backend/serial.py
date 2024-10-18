@@ -4,7 +4,7 @@ import json
 from shioaji.backend.solace.tick import TickSTKv1, TickFOPv1
 from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
 from shioaji.backend.solace.quote import QuoteSTKv1
-from shioaji.constant import ChangeType, TickType, Exchange 
+from shioaji.constant import ChangeType, TickType
 from shioaji.data import Snapshot
 def dict_to_stk_tick(data_dict):
     stk_tick = TickSTKv1(
