@@ -19,3 +19,4 @@ frontend/__pycache__/message.cpython-312.pyc
 frontend/__pycache__/webhook.cpython-312.pyc
 backend/__pycache__/data_redis.cpython-312.pyc
 backend/__pycache__/serial.cpython-312.pyc
+dump.rdb
