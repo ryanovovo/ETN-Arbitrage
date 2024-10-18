@@ -2,6 +2,7 @@ import asyncio
 from backend.callback import CallbackManager
 from backend.data_redis import DataManager
 import logging
+import signal
 
 
 class QuoteManager:
@@ -29,9 +30,10 @@ class QuoteManager:
         self.api.quote.set_on_quote_stk_v1_callback(
             self.on_data_received('stk', 'quote')
         )
+        self.loop.add_signal_handler(signal.SIGINT, self.__del__)
 
     def __del__(self):
-        self.clear_all_callbacks()
+        self.data_manager.shutdown_redis()
 
     def on_data_received(self, category: str, data_type: str):
         def handler(_exchange, data):
