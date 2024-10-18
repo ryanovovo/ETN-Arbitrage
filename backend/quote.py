@@ -36,10 +36,7 @@ class QuoteManager:
     def on_data_received(self, category: str, data_type: str):
         def handler(_exchange, data):
             self.data_manager.add_data(data)
-            self.callback_manager.run_callbacks(data.code,
-                                                category,
-                                                data_type,
-                                                self.data_manager)
+            self.callback_manager.run_callbacks(data.code, category, data_type, data)
         return handler
 
     def subscribe(self, code: str, category: str, data_type: str):
@@ -66,19 +63,10 @@ class QuoteManager:
         self.data_manager.unsubscribe(code, category, data_type)
         logging.info(f"Unsubscribed from {category} {data_type} {code}")
 
-    def add_callback(self,
-                     code: str,
-                     category: str,
-                     data_type: str,
-                     callback,
-                     *args,
-                     **kwargs):
-        self.callback_manager.add_callback(code,
-                                           category,
-                                           data_type,
-                                           callback,
-                                           *args,
-                                           **kwargs)
+    def add_callback(self,code: str, category: str, data_type: str,
+                     callback, *args, **kwargs):
+        self.callback_manager.add_callback(code, category, data_type,
+                                           callback, *args, **kwargs)
 
     def clear_callbacks(self, code: str, category: str, data_type: str):
         self.callback_manager.clear_callbacks(code, category, data_type)
