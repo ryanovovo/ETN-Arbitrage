@@ -9,6 +9,7 @@ from shioaji.backend.solace.tick import TickSTKv1, TickFOPv1
 from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
 from shioaji.backend.solace.quote import QuoteSTKv1
 from shioaji.data import Snapshot
+import json
 
 
 def get_api():
@@ -97,6 +98,7 @@ def get_close(api, code, category, sync=False):
     stock_market_close = time(13, 30)
     future_market_close = time(13, 45)
     kbars = get_nearest_fullday_kbar(api, code, category)
+    logging.info(f"Fetching close price for {category} {code}")
     if category == 'stk' or sync:
         close = kbars.Close.iloc[-1]
     elif category == 'fop':
@@ -104,3 +106,5 @@ def get_close(api, code, category, sync=False):
     else:
         raise ValueError(f"Invalid category: {category}")
     return close
+
+
