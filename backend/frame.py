@@ -7,9 +7,9 @@ class Frame:
     def __init__(self, api=None, snapshot_init=False, code=None, category=None):
         # common attributes
         self.api = api
-        self.code = None
+        self.code = code
         self.data_type = None
-        self.category = None
+        self.category = category
         self.is_snapshot = None
         self.timestamp = None
 
@@ -41,6 +41,10 @@ class Frame:
                 raise ValueError("Category is required for snapshot initialization")
             snapshot = get_snapshot(api, code, category)
             self.update_frame(snapshot)
+            self.update_close()
+        
+        if code is not None and category is not None:
+            self.update_close()
 
     def __iter__(self):
         yield 'code', self.code
