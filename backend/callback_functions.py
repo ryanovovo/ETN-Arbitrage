@@ -1,6 +1,7 @@
 from pprint import pprint
 from backend.utils import get_nearmonth_future_code
 from frontend.message import state_to_embed
+import json
 
 def update(kwargs, stock_data, future_data):
     state = kwargs['state']
@@ -31,4 +32,6 @@ def callback_tx_bidask(api, data_manager, args, kwargs):
     nearmonth_future_code = get_nearmonth_future_code(api, 'TXFR1')
     stock_data = data_manager.get_latest_data('020039', 'stk', 'quote')
     future_data = data_manager.get_latest_data(nearmonth_future_code, 'fop', 'bidask')
+    future_frame = kwargs['state'].future_frame
     update(kwargs, stock_data, future_data)
+    pprint(json.dumps(future_data.to_dict(raw=True)), sort_dicts=False)
