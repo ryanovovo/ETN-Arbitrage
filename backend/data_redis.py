@@ -1,7 +1,5 @@
-from collections import deque, defaultdict
 from typing import Optional
-from backend.utils import get_snapshot
-from backend.utils import get_data_type
+from backend.utils import get_snapshot, get_data_type, get_nearmonth_future_code
 import redis
 import subprocess
 from backend.serial import serialize, deserialize
@@ -17,9 +15,7 @@ class DataManager:
         self.r = None
         while self.r is None:
             try:
-                # 尝试连接 Redis 服务器
                 self.r = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
-                # 尝试发送 ping，确认 Redis 是否启动
                 self.r.ping()
             except redis.ConnectionError:
                 # 如果连接失败，等待一段时间后重试
@@ -33,7 +29,7 @@ class DataManager:
             )
         subscribed_key = f"subscribed:{category}:{data_type}"
         assert self.r.sadd(subscribed_key, code) == 1
-        storage_key = f"storage:{code}:{category}:{data_type}"
+        storage_key = f"storage:{code}:{category}:{'snapshot'}"
         snapshot = get_snapshot(self.api, code, category)
         serialized_snapshot = serialize(snapshot, category, 'snapshot')
         self.r.xadd(storage_key, {'data': serialized_snapshot}, maxlen=self.max_data_size, approximate=True)
@@ -80,9 +76,9 @@ class DataManager:
         return data
 
     def get_latest_data(self, code: str,
-                        category: str,
-                        data_type: str,
-                        snapshot: bool = True):
+                    category: str,
+                    data_type: str,
+                    snapshot: bool = True):
         storage_key = f"storage:{code}:{category}:{data_type}"
         if self.__is_empty(code, category, data_type):
             if snapshot:
@@ -102,6 +98,10 @@ class DataManager:
         return self.r.sismember(subscribed_key, code)
 
     def __add_data(self, code: str, category: str, data_type: str, data):
+        if category == 'fop':
+            near_month_future_code = get_nearmonth_future_code(self.api, code)
+            if code == near_month_future_code:
+                code = code[:3] + 'R1'
         if not self.__is_subscribed(code, category, data_type):
             raise ValueError(
                 f"Code {code} is not subscribed to {category} {data_type}"
