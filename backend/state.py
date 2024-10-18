@@ -4,7 +4,7 @@ from backend.utils import get_data_type, get_sync_future_stock_close
 
 
 class State:
-    def __init__(self, api, stock_frame=None, future_frame=None):
+    def __init__(self, api, stock_code, future_code):
         self.api = api
         self.stock_frame = None
         self.future_frame = None
@@ -16,13 +16,9 @@ class State:
         self.threshold = Decimal('0.5')
         self.action = None
         self.action_price = None
-        if stock_frame is not None:
-            self.stock_frame = stock_frame
-        if future_frame is not None:
-            self.future_frame = future_frame
-        if self.stock_frame is not None and self.future_frame is not None:
-            self.update_close()
-            self.calculate_arbitrage()
+        self.stock_frame = Frame(api, snapshot_init=True, code=stock_code, category='stk')
+        self.future_frame = Frame(api, snapshot_init=True, code=future_code, category='fop')
+        self.update_close()
 
     def get_frame(self, category):
         if category == 'stk':
