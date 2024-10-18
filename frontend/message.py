@@ -1,13 +1,13 @@
 import discord
-def arbitrage_to_embed(arbitrage):
-    if arbitrage.action == 'sell':
+def state_to_embed(state):
+    if state.action == 'sell':
         color = discord.Color.green()
-    elif arbitrage.action == 'buy':
+    elif state.action == 'buy':
         color = discord.Color.red()
     else:
         color = discord.Color.dark_gray()
-    stock_frame = arbitrage.stock_frame
-    future_frame = arbitrage.future_frame
+    stock_frame = state.stock_frame
+    future_frame = state.future_frame
     if stock_frame.simtrade:
         stock_mark = ' [試搓] ' 
     if stock_frame.is_snapshot:
@@ -22,9 +22,9 @@ def arbitrage_to_embed(arbitrage):
     else:
         future_mark = ' '
 
-    if arbitrage.action == 'sell':
+    if state.action == 'sell':
         action = '賣出'
-    elif arbitrage.action == 'buy':
+    elif state.action == 'buy':
         action = '買進'
     else:
         action = '無'
@@ -44,11 +44,11 @@ def arbitrage_to_embed(arbitrage):
     embed.add_field(name='最新成交價', value=f"{str(stock_frame.price)}{stock_mark}({str(stock_frame.price_pct_chg)}%)", inline=False)
     embed.add_field(name='最佳買價', value=f"{str(stock_frame.best_bid)} ({str(stock_frame.bid_pct_chg)}%)", inline=True)
     embed.add_field(name='最佳賣價', value=f"{str(stock_frame.best_ask)} ({str(stock_frame.ask_pct_chg)}%)", inline=True)
-    embed.add_field(name='預期價格', value=str(arbitrage.expected_price), inline=False)
+    embed.add_field(name='預期價格', value=str(state.expected_price), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
 
     embed.add_field(name='套利機會', value='', inline=False)
     embed.add_field(name='買賣方向', value=action, inline=False) 
-    embed.add_field(name='執行價格', value=str(arbitrage.action_price), inline=False)
+    embed.add_field(name='執行價格', value=str(state.action_price), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
     return embed
