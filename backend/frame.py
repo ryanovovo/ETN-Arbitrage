@@ -41,10 +41,10 @@ class Frame:
                 raise ValueError("Category is required for snapshot initialization")
             snapshot = get_snapshot(api, code, category)
             self.update_frame(snapshot)
-            self.update_close()
+            # self.update_close()
         
-        if code is not None and category is not None:
-            self.update_close()
+        # if code is not None and category is not None:
+            # self.update_close()
 
     def __iter__(self):
         yield 'code', self.code
@@ -116,7 +116,7 @@ class Frame:
             if self.best_ask is not None:
                 self.ask_pct_chg = round((self.best_ask - self.close) / self.close * 100, 2)
 
-    def update_close(self):
+    def __update_close(self):
         close = get_close(self.api, self.code, self.category, sync=True)
         self.close = round(Decimal(close), 2)
         self.update_pct_chg()

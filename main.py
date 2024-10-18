@@ -28,7 +28,7 @@ nearmonth_future_code = get_nearmonth_future_code(api, 'TXFR1')
 
 etn_frame = Frame(api, snapshot_init=True, code='020039', category='stk')
 future_frame = Frame(api, snapshot_init=True, code=nearmonth_future_code, category='fop')
-state = State(stock_frame=etn_frame, future_frame=future_frame)
+state = State(api, stock_frame=etn_frame, future_frame=future_frame)
 webhook_manager = WebhookManager()
 
 # 訂閱與回調設定
@@ -121,8 +121,7 @@ class MyView(View):
     @discord.ui.button(label="套利資訊", style=discord.ButtonStyle.primary)
     async def send_embed(self, interaction: discord.Interaction, button: discord.ui.Button):
         # 傳送嵌入式套利資訊訊息，編輯上一次發送的訊息
-        state.stock_frame.update_close()
-        state.future_frame.update_close()
+        state.update_close()
         embed = state_to_embed(state)
 
         global last_message

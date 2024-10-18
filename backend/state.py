@@ -1,10 +1,11 @@
 from decimal import Decimal
 from backend.frame import Frame
-from backend.utils import get_data_type
+from backend.utils import get_data_type, get_sync_future_stock_close
 
 
 class State:
-    def __init__(self, stock_frame=None, future_frame=None):
+    def __init__(self, api, stock_frame=None, future_frame=None):
+        self.api = api
         self.stock_frame = None
         self.future_frame = None
         self.bid_premium_pct = None
@@ -20,6 +21,7 @@ class State:
         if future_frame is not None:
             self.future_frame = future_frame
         if self.stock_frame is not None and self.future_frame is not None:
+            self.update_close()
             self.calculate_arbitrage()
 
     def get_frame(self, category):
@@ -38,6 +40,14 @@ class State:
             self.future_frame.update_frame(data)
         else:
             raise ValueError(f"Invalid category: {category}")
+        self.calculate_arbitrage()
+    
+    def update_close(self):
+        stock_close, future_close = get_sync_future_stock_close(self.api, self.stock_frame.code, self.future_frame.code)
+        self.stock_frame.close = round(Decimal(stock_close), 2)
+        self.future_frame.close = round(Decimal(future_close), 2)
+        self.stock_frame.update_pct_chg()
+        self.future_frame.update_pct_chg()
         self.calculate_arbitrage()
     
     def calculate_arbitrage(self):

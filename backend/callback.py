@@ -1,6 +1,7 @@
 import asyncio
 from collections import defaultdict
 from inspect import iscoroutinefunction
+import subprocess
 
 
 class CallbackManager:
@@ -74,4 +75,5 @@ class CallbackManager:
                     self.loop.run_in_executor(None,callback, self.api,
                                               data_manager, args, kwargs)
                 except KeyboardInterrupt:
+                    subprocess.run(["redis-cli", "shutdown"], check=True)
                     self.loop.stop()

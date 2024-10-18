@@ -21,10 +21,8 @@ class DataManager:
                 self.r = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
                 # 尝试发送 ping，确认 Redis 是否启动
                 self.r.ping()
-                print("Redis 已启动并可以接受连接")
             except redis.ConnectionError:
                 # 如果连接失败，等待一段时间后重试
-                print("等待 Redis 启动...")
                 time.sleep(1)  # 每次等待 1 秒钟
         self.r.flushdb()
 
