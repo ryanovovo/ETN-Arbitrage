@@ -36,9 +36,7 @@ class DataManager:
 
     def subscribe(self, code: str, category: str, data_type: str):
         if self.__is_subscribed(code, category, data_type):
-            raise ValueError(
-                f"Code {code} is already subscribed to {category} {data_type}"
-            )
+            return
         self.subscribed[category][data_type].add(code)
         self.storage[code][category]['snapshot'].append(
             get_snapshot(self.api, code, category)
@@ -46,9 +44,7 @@ class DataManager:
 
     def unsubscribe(self, code: str, category: str, data_type: str):
         if not self.__is_subscribed(code, category, data_type):
-            raise ValueError(
-                f"Code {code} is not subscribed to {category} {data_type}"
-            )
+            return
         self.subscribed[category][data_type].remove(code)
         self.storage[code][category][data_type].clear()
 
