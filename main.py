@@ -144,16 +144,27 @@ async def on_ready():
     
     # 指定要傳送訊息的頻道 ID
     global channel_id
-    channel = bot.get_channel(channel_id)
+    webhook_channel_id = int(os.getenv('WEBHOOK_CHANNEL_ID'))
+    bot_channel = bot.get_channel(channel_id)
+    webhook_channel = bot.get_channel(webhook_channel_id)
     
-    if channel:
-        await channel.purge(limit=100)  # 啟動時清理訊息
+    if bot_channel:
+        await bot_channel.purge(limit=100)  # 啟動時清理訊息
         view = MyView()
         global last_message
         # 傳送初始按鈕訊息並保存該訊息以供後續編輯
-        last_message = await channel.send("請選擇指令:", view=view)
+        last_message = await bot_channel.send("請選擇指令:", view=view)
     else:
         print(f"Channel with ID {channel_id} not found.")
+        logging.error(f"Channel with ID {channel_id} not found.")
+    
+    if webhook_channel:
+        last_message = await webhook_channel.history(limit=1).flatten()
+        last_message_id = last_message[0].id
+        await webhook_channel.purge(limit=100, check=lambda msg: msg.id != last_message_id)
+    else:
+        print(f"Channel with ID {webhook_channel_id} not found.")
+        logging.error(f"Channel with ID {webhook_channel_id} not found.")
 
 # 獲取頻道和機器人的 token
 load_dotenv()
