@@ -2,10 +2,10 @@ import asyncio
 import logging
 from decimal import Decimal
 from backend.quote import QuoteManager
-from backend.utils import get_api, get_nearmonth_future_code
+from backend.utils import get_api
 from backend.frame import Frame
 from backend.state import State
-from backend.callback_functions import callback_tx_tick, callback_tx_bidask, callback_etn
+from backend.callback_functions import callback_update
 from frontend.webhook import WebhookManager
 from frontend.message import state_to_embed
 import discord
@@ -24,20 +24,21 @@ print(api.usage())
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 quote_manager = QuoteManager(api, loop)
-nearmonth_future_code = get_nearmonth_future_code(api, 'TXFR1')
 
-etn_frame = Frame(api, snapshot_init=True, code='020039', category='stk')
-future_frame = Frame(api, snapshot_init=True, code=nearmonth_future_code, category='fop')
-state = State(api, stock_frame=etn_frame, future_frame=future_frame)
+stock_code = '020039'
+future_code = 'TXFR1'
+# future_code = get_nearmonth_future_code(api, future_code)
+
+state = State(api, stock_code=stock_code, future_code=future_code)
 webhook_manager = WebhookManager()
 
 # 訂閱與回調設定
-quote_manager.subscribe(nearmonth_future_code, 'fop', 'tick')
-quote_manager.subscribe(nearmonth_future_code, 'fop', 'bidask')
-quote_manager.subscribe('020039', 'stk', 'quote')
-quote_manager.add_callback(nearmonth_future_code, 'fop', 'tick', callback_tx_tick, state=state, webhook_manager=webhook_manager)
-quote_manager.add_callback(nearmonth_future_code, 'fop', 'bidask', callback_tx_bidask, state=state, webhook_manager=webhook_manager)
-quote_manager.add_callback('020039', 'stk', 'quote', callback_etn, state=state, webhook_manager=webhook_manager)
+quote_manager.subscribe(future_code, 'fop', 'tick')
+quote_manager.subscribe(future_code, 'fop', 'bidask')
+quote_manager.subscribe(stock_code, 'stk', 'quote')
+quote_manager.add_callback(future_code, 'fop', 'tick', callback_update, state=state, webhook_manager=webhook_manager)
+quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update, state=state, webhook_manager=webhook_manager)
+quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update, state=state, webhook_manager=webhook_manager)
 
 # 初始化Discord機器人
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
@@ -84,8 +85,8 @@ class MyView(View):
         global last_message
         global is_subscribed
         if not is_subscribed:
-            quote_manager.subscribe(nearmonth_future_code, 'fop', 'tick')
-            quote_manager.subscribe(nearmonth_future_code, 'fop', 'bidask')
+            quote_manager.subscribe(future_code, 'fop', 'tick')
+            quote_manager.subscribe(future_code, 'fop', 'bidask')
             quote_manager.subscribe('020039', 'stk', 'quote')
             embed = discord.Embed(title="已訂閱！", color=0x00FF00)
             if last_message:
@@ -104,8 +105,8 @@ class MyView(View):
         global last_message
         global is_subscribed
         if is_subscribed:
-            quote_manager.unsubscribe(nearmonth_future_code, 'fop', 'tick')
-            quote_manager.unsubscribe(nearmonth_future_code, 'fop', 'bidask')
+            quote_manager.unsubscribe(future_code, 'fop', 'tick')
+            quote_manager.unsubscribe(future_code, 'fop', 'bidask')
             quote_manager.unsubscribe('020039', 'stk', 'quote')
             embed = discord.Embed(title="已取消訂閱！", color=0xFF0000)
             if last_message:
