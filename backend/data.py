@@ -2,12 +2,13 @@ from collections import deque, defaultdict
 from typing import Optional
 from backend.utils import get_snapshot
 from backend.utils import get_data_type
-
+from threading import RLock
 
 class DataManager:
     def __init__(self, api, max_data_size=100):
         self.api = api
         self.max_data_size = max_data_size
+        self.lock = RLock()
         self.storage = defaultdict(lambda: {
             'stk': {
                 'tick': deque(maxlen=max_data_size),
@@ -103,5 +104,6 @@ class DataManager:
         self.storage[code][category][data_type].append(data)
 
     def __is_empty(self, code: str, category: str, data_type: str):
-        return code not in self.subscribed[category][data_type] or \
-               len(self.storage[code][category][data_type]) == 0
+        with self.lock:
+            return code not in self.subscribed[category][data_type] or \
+                len(self.storage[code][category][data_type]) == 0
