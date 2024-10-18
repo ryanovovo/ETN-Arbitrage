@@ -79,8 +79,4 @@ class CallbackManager:
             if iscoroutinefunction(callback):
                 self.loop.create_task(callback(data, args, kwargs))
             else:
-                try:
-                    self.loop.run_in_executor(None, callback, data, args, kwargs)
-                except KeyboardInterrupt:
-                    subprocess.run(["redis-cli", "shutdown"], check=True)
-                    self.loop.stop()
+                self.loop.run_in_executor(None, callback, data, args, kwargs)
