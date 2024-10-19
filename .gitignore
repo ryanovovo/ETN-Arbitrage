@@ -20,3 +20,13 @@ frontend/__pycache__/webhook.cpython-312.pyc
 backend/__pycache__/data_redis.cpython-312.pyc
 backend/__pycache__/serial.cpython-312.pyc
 dump.rdb
+fetchdata/2024-10-08.csv
+fetchdata/2024-10-09.csv
+fetchdata/2024-10-11.csv
+fetchdata/2024-10-14.csv
+fetchdata/2024-10-15.csv
+fetchdata/2024-10-16.csv
+fetchdata/2024-10-17.csv
+fetchdata/fetch_ticks.ipynb
+fetchdata/txfr1_2024_10_18.csv
+environment.yaml
