@@ -25,6 +25,7 @@ print(api.usage())
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 quote_manager = QuoteManager(api, loop)
+signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
 stock_code = '020039'
 future_code = 'TXFR1'
