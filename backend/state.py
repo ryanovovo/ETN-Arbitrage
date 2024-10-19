@@ -16,6 +16,10 @@ class State:
         self.threshold = Decimal('0.5')
         self.action = None
         self.action_price = None
+        self.expeced_profit = None
+        self.fee = Decimal('0.001425')
+        self.fee_discount = Decimal('0.2')
+        self.tax = Decimal('0.001')
         self.stock_frame = Frame(api, snapshot_init=True, code=stock_code, category='stk')
         self.future_frame = Frame(api, snapshot_init=True, code=future_code, category='fop')
         self.update_close()
@@ -53,6 +57,11 @@ class State:
                 self.arbitrage = True
                 self.action = 'sell'
                 self.action_price = self.stock_frame.best_bid
+                pre_fee_profit = (self.action_price - self.expected_price) * 1000 * self.stock_frame.volume
+                total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
+                            self.expected_price * (self.fee * self.fee_discount)) * \
+                            1000 * self.stock_frame.volume
+                self.expeced_profit = pre_fee_profit - total_fee
         else:
             self.bid_premium_pct = None
         
@@ -62,6 +71,11 @@ class State:
                 self.arbitrage = True
                 self.action = 'buy'
                 self.action_price = self.stock_frame.best_ask
+                pre_fee_profit = (self.expected_price - self.action_price) * 1000 * self.stock_frame.volume
+                total_fee = (self.action_price * (self.fee * self.fee_discount) + \
+                            self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
+                            1000 * self.stock_frame.volume
+                self.expeced_profit = pre_fee_profit - total_fee
         else:
             self.ask_discount_pct = None
     
@@ -73,9 +87,21 @@ class State:
                 self.arbitrage = True
                 self.action = 'sell'
                 self.action_price = self.stock_frame.price
+                pre_fee_profit = (self.action_price - self.expected_price) * 1000 * self.stock_frame.volume
+                total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
+                            self.expected_price * (self.fee * self.fee_discount)) * \
+                            1000 * self.stock_frame.volume
+                self.expeced_profit = pre_fee_profit - total_fee
             elif self.price_pod_pct <= -self.threshold:
                 self.arbitrage = True
                 self.action = 'buy'
                 self.action_price = self.stock_frame.price
+                pre_fee_profit = (self.expected_price - self.action_price) * 1000 * self.stock_frame.volume
+                total_fee = (self.action_price * (self.fee * self.fee_discount) + \
+                            self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
+                            1000 * self.stock_frame.volume
+                self.expeced_profit = pre_fee_profit - total_fee
+        if self.expeced_profit is not None:
+            self.expeced_profit = round(self.expeced_profit, 2)
 
         
