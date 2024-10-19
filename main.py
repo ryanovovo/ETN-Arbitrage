@@ -29,7 +29,8 @@ if __name__ == "__main__":
 
     # 設置每天的 7:00 和 14:00 根據台北時區執行重啟任務
     scheduler.add_job(stop_and_restart_python_file, 'cron', hour=7, minute=0, timezone=tz)
-    scheduler.add_job(stop_and_restart_python_file, 'cron', hour=14, minute=0, timezone=tz)
+    scheduler.add_job(stop_and_restart_python_file, 'cron', hour=15, minute=0, timezone=tz)
+    scheduler.add_job(stop_and_restart_python_file, 'cron', hour=2, minute=0, timezone=tz)
 
     # 先啟動程式
     run_python_file()
