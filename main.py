@@ -14,6 +14,8 @@ from discord.ui import Button, View
 import os
 from dotenv import load_dotenv
 import signal
+from datetime import datetime, timedelta
+import pytz
 
 # 設定日誌
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
@@ -136,7 +138,9 @@ class MyView(View):
             quote_manager.subscribe(stock_code, 'stk', 'quote')
             is_subscribed = True
         # 傳送嵌入式套利資訊訊息，編輯上一次發送的訊息
-        state.update_close()
+        now = datetime.now(pytz.timezone('Asia/Taipei'))
+        if now - state.updated_close_timestamp > timedelta(hours=6):
+            state.update_close()
         embed = state_to_embed(state)
 
         global last_message
