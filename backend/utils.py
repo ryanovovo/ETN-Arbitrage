@@ -10,6 +10,7 @@ from shioaji.backend.solace.bidask import BidAskSTKv1, BidAskFOPv1
 from shioaji.backend.solace.quote import QuoteSTKv1
 from shioaji.data import Snapshot
 import json
+import asyncio
 
 
 def get_api():
@@ -88,9 +89,11 @@ def get_nearest_fullday_kbar(api, code: str, category: str, max_try_days: int = 
         kbars = api.kbars(contract, start=date_str, end=date_str)
         logging.info(f"Fetching kbars for {category} {code} on {date_str}")
         kbars_df = pd.DataFrame({**kbars})
+        if kbars_df.empty:
+            continue
         kbars_df.ts = pd.to_datetime(kbars_df.ts)
         filtered_kbars_df = kbars_df.loc[:kbars_df[kbars_df['Volume'] > 0].index[-1]]
-        if filtered_kbars_df is not None:
+        if not filtered_kbars_df.empty:
             return filtered_kbars_df
     raise ValueError(f"Failed to fetch kbars for {category} {code}")
 
@@ -116,5 +119,11 @@ def get_sync_future_stock_close(api, stock_code, future_code):
     stock_timestamp = stock_df.ts.iloc[-1]
     future_close = future_df[future_df.ts <= stock_timestamp].Close.iloc[-1]
     return stock_close, future_close
+
+async def periodic_get_close(state, hours=12):
+    while True:
+        await asyncio.sleep(hours * 3600)
+        logging.info(f"Updated close price for stock and future")
+        state.update_close()
 
 
