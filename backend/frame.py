@@ -18,6 +18,7 @@ class Frame:
 
         # tick attributes
         self.price = None
+        self.volume = None
 
         # bidask attributes
         self.best_bid = None
@@ -87,11 +88,13 @@ class Frame:
     def _snapshot_to_frame(self, snapshot):
         self.price = round(Decimal(snapshot.close), 2)
         self.timestamp = to_datetime(snapshot.ts)
+        self.volume = snapshot.volume
 
     def _tick_to_frame(self, tick):
         self.timestamp = tick.datetime
         self.simtrade = tick.simtrade
         self.price = tick.close
+        self.volume = tick.volume
         self.update_pct_chg()
 
     def _bidask_to_frame(self, bidask):
