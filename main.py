@@ -26,6 +26,8 @@ api = get_api()
 print(api.usage())
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
+loop.add_signal_handler(signal.SIGINT, loop.stop)
+signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 quote_manager = QuoteManager(api, loop)
 
 stock_code = '020039'
@@ -183,8 +185,6 @@ load_dotenv()
 channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
 bot_token = os.getenv('DISCORD_BOT_TOKEN')
 
-loop.add_signal_handler(signal.SIGINT, loop.stop)
-signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 # 啟動機器人並將其綁定到事件循環
 loop.create_task(bot.start(bot_token))
 loop.create_task(periodic_get_close(state, hours=12))
