@@ -2,7 +2,7 @@ import asyncio
 import logging
 from decimal import Decimal
 from backend.quote import QuoteManager
-from backend.utils import get_api
+from backend.utils import get_api, periodic_get_close
 from backend.frame import Frame
 from backend.state import State
 from backend.callback_functions import callback_update
@@ -80,6 +80,7 @@ class MyView(View):
             embed.add_field(name='訂閱狀態', value="已訂閱", inline=False)
         else:
             embed.add_field(name='訂閱狀態', value="未訂閱", inline=False)
+        embed.add_field(name='收盤價更新時間', value=state.updated_close_timestamp.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
 
         # 使用 edit() 編輯最後發送的訊息
         if last_message:
@@ -159,10 +160,10 @@ async def on_ready():
         logging.error(f"Channel with ID {channel_id} not found.")
     
     if webhook_channel:
-        last_message = [message async for message in webhook_channel.history(limit=1)]
-        if last_message:
-            last_message_id = last_message[0].id
-            await webhook_channel.purge(limit=100, check=lambda msg: msg.id != last_message_id)
+        webhook_last_message = [message async for message in webhook_channel.history(limit=1)]
+        if webhook_last_message:
+            webhook_last_message_id = webhook_last_message[0].id
+            await webhook_channel.purge(limit=100, check=lambda msg: msg.id != webhook_last_message_id)
     else:
         print(f"Channel with ID {webhook_channel_id} not found.")
         logging.error(f"Channel with ID {webhook_channel_id} not found.")
@@ -176,4 +177,5 @@ loop.add_signal_handler(signal.SIGINT, loop.stop)
 signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 # 啟動機器人並將其綁定到事件循環
 loop.create_task(bot.start(bot_token))
+loop.create_task(periodic_get_close(state, hours=12))
 loop.run_forever()
