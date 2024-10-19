@@ -87,25 +87,25 @@ class MyView(View):
             await last_message.edit(content="", embed=embed, view=self)
         await interaction.response.defer()
 
-    @discord.ui.button(label="訂閱行情", style=discord.ButtonStyle.success)
-    async def subscribe_market(self, interaction: discord.Interaction, button: discord.ui.Button):
-        # 訂閱操作
-        global last_message
-        global is_subscribed
-        if not is_subscribed:
-            quote_manager.subscribe(future_code, 'fop', 'tick')
-            quote_manager.subscribe(future_code, 'fop', 'bidask')
-            quote_manager.subscribe(stock_code, 'stk', 'quote')
-            embed = discord.Embed(title="已訂閱！", color=0x00FF00)
-            if last_message:
-                await last_message.edit(content="", embed=embed, view=self)
-            await interaction.response.defer()
-            is_subscribed = True
-        else:
-            embed = discord.Embed(title="已訂閱！", color=0x00FF00)
-            if last_message:
-                await last_message.edit(content="", embed=embed, view=self)
-            await interaction.response.defer()
+    # @discord.ui.button(label="訂閱行情", style=discord.ButtonStyle.success)
+    # async def subscribe_market(self, interaction: discord.Interaction, button: discord.ui.Button):
+    #     # 訂閱操作
+    #     global last_message
+    #     global is_subscribed
+    #     if not is_subscribed:
+    #         quote_manager.subscribe(future_code, 'fop', 'tick')
+    #         quote_manager.subscribe(future_code, 'fop', 'bidask')
+    #         quote_manager.subscribe(stock_code, 'stk', 'quote')
+    #         embed = discord.Embed(title="已訂閱！", color=0x00FF00)
+    #         if last_message:
+    #             await last_message.edit(content="", embed=embed, view=self)
+    #         await interaction.response.defer()
+    #         is_subscribed = True
+    #     else:
+    #         embed = discord.Embed(title="已訂閱！", color=0x00FF00)
+    #         if last_message:
+    #             await last_message.edit(content="", embed=embed, view=self)
+    #         await interaction.response.defer()
 
     @discord.ui.button(label="取消訂閱", style=discord.ButtonStyle.danger)
     async def unsubscribe_market(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -127,8 +127,14 @@ class MyView(View):
                 await last_message.edit(content="", embed=embed, view=self)
             await interaction.response.defer()
 
-    @discord.ui.button(label="套利資訊", style=discord.ButtonStyle.primary)
+    @discord.ui.button(label="套利資訊", style=discord.ButtonStyle.success)
     async def send_embed(self, interaction: discord.Interaction, button: discord.ui.Button):
+        global is_subscribed
+        if not is_subscribed:
+            quote_manager.subscribe(future_code, 'fop', 'tick')
+            quote_manager.subscribe(future_code, 'fop', 'bidask')
+            quote_manager.subscribe(stock_code, 'stk', 'quote')
+            is_subscribed = True
         # 傳送嵌入式套利資訊訊息，編輯上一次發送的訊息
         state.update_close()
         embed = state_to_embed(state)
