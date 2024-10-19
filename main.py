@@ -25,7 +25,6 @@ print(api.usage())
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 quote_manager = QuoteManager(api, loop)
-signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
 stock_code = '020039'
 future_code = 'TXFR1'
@@ -160,9 +159,10 @@ async def on_ready():
         logging.error(f"Channel with ID {channel_id} not found.")
     
     if webhook_channel:
-        last_message = await webhook_channel.history(limit=1).flatten()
-        last_message_id = last_message[0].id
-        await webhook_channel.purge(limit=100, check=lambda msg: msg.id != last_message_id)
+        last_message = [message async for message in webhook_channel.history(limit=1)]
+        if last_message:
+            last_message_id = last_message[0].id
+            await webhook_channel.purge(limit=100, check=lambda msg: msg.id != last_message_id)
     else:
         print(f"Channel with ID {webhook_channel_id} not found.")
         logging.error(f"Channel with ID {webhook_channel_id} not found.")
@@ -173,7 +173,7 @@ channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
 bot_token = os.getenv('DISCORD_BOT_TOKEN')
 
 loop.add_signal_handler(signal.SIGINT, loop.stop)
-
+signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 # 啟動機器人並將其綁定到事件循環
 loop.create_task(bot.start(bot_token))
 loop.run_forever()
