@@ -97,6 +97,21 @@ def get_nearest_fullday_kbar(api, code: str, category: str, max_try_days: int = 
             return filtered_kbars_df
     raise ValueError(f"Failed to fetch kbars for {category} {code}")
 
+def get_day_kbars(api, code, category, date):
+    contract = None
+    if category == 'stk':
+        contract = api.Contracts.Stocks[code]
+    elif category == 'fop':
+        contract = api.Contracts.Futures[code]
+    date_str = date.strftime('%Y-%m-%d')
+    kbars = api.kbars(contract, start=date_str, end=date_str)
+    logging.info(f"Fetching kbars for {category} {code} on {date_str}")
+    kbars_df = pd.DataFrame({**kbars})
+    if kbars_df.empty:
+        raise ValueError(f"Failed to fetch kbars for {category} {code} on {date_str}")
+    kbars_df.ts = pd.to_datetime(kbars_df.ts)
+    return kbars_df
+
 
 def get_close(api, code, category, sync=False):
     # stock_market_close = time(13, 30)
@@ -114,9 +129,9 @@ def get_close(api, code, category, sync=False):
 
 def get_sync_future_stock_close(api, stock_code, future_code):
     stock_df = get_nearest_fullday_kbar(api, stock_code, 'stk')
-    future_df = get_nearest_fullday_kbar(api, future_code, 'fop')
     stock_close = stock_df.Close.iloc[-1]
     stock_timestamp = stock_df.ts.iloc[-1]
+    future_df = get_day_kbars(api, future_code, 'fop', stock_timestamp)
     future_close = future_df[future_df.ts <= stock_timestamp].Close.iloc[-1]
     return stock_close, future_close
 
