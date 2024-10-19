@@ -1,6 +1,8 @@
 from decimal import Decimal
+from datetime import datetime
 from backend.frame import Frame
 from backend.utils import get_data_type, get_sync_future_stock_close
+import pytz
 
 
 class State:
@@ -22,6 +24,7 @@ class State:
         self.tax = Decimal('0.001')
         self.stock_frame = Frame(api, snapshot_init=True, code=stock_code, category='stk')
         self.future_frame = Frame(api, snapshot_init=True, code=future_code, category='fop')
+        self.updated_close_timestamp = None
         self.update_close()
 
     def get_frame(self, category):
@@ -49,6 +52,7 @@ class State:
         self.stock_frame.update_pct_chg()
         self.future_frame.update_pct_chg()
         self.calculate_arbitrage()
+        self.updated_close_timestamp = datetime.now(pytz.timezone('Asia/Taipei'))
     
     def calculate_arbitrage(self):
         if self.stock_frame.bid_pct_chg is not None and self.future_frame.price_pct_chg is not None:
