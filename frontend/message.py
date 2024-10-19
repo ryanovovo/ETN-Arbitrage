@@ -36,8 +36,8 @@ def state_to_embed(state):
 
     embed.add_field(name='台指期資訊', value='', inline=False)
     embed.add_field(name=future_frame.timestamp.strftime("%Y-%m-%d %H:%M:%S"), value='', inline=True)
-    embed.add_field(name='最新成交價', value=f"{str(future_frame.price)}{future_mark}({str(future_frame.price_pct_chg)}%)", inline=False)
     embed.add_field(name='台指期現貨同步收盤價', value=str(future_frame.close), inline=True)
+    embed.add_field(name='最新成交價', value=f"{str(future_frame.price)}{future_mark}({str(future_frame.price_pct_chg)}%)", inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
 
     embed.add_field(name='ETN資訊', value='', inline=False)
