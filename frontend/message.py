@@ -43,7 +43,7 @@ def state_to_embed(state):
     embed.add_field(name='ETN資訊', value='', inline=False)
     embed.add_field(name=stock_frame.timestamp.strftime("%Y-%m-%d %H:%M:%S"), value='', inline=True)
     embed.add_field(name='成交價', value=f"{str(stock_frame.price)}{stock_mark}({str(stock_frame.price_pct_chg)}%)", inline=False)
-    embed.add_field(name='成交量', value=str(stock_frame.volume), inline=False)
+    embed.add_field(name='成交量', value=str(stock_frame.volume), inline=True)
     embed.add_field(name='最佳買價', value=f"{str(stock_frame.best_bid)} ({str(stock_frame.bid_pct_chg)}%)", inline=True)
     embed.add_field(name='最佳賣價', value=f"{str(stock_frame.best_ask)} ({str(stock_frame.ask_pct_chg)}%)", inline=True)
     embed.add_field(name='預期價格', value=str(state.expected_price), inline=False)
