@@ -1,5 +1,3 @@
-from backend.utils import get_nearmonth_future_code
-
 
 def callback_update(data, args, kwargs):
     try:
