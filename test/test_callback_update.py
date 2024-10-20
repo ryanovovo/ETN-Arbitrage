@@ -23,17 +23,17 @@ def test_callback_update():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     # callback_update(stk_tick, None, kwargs)
-    # callback_update(stk_bidask, None, kwargs)
-    # callback_update(stk_quote, None, kwargs)
-    # callback_update(fop_tick, None, kwargs)
-    # callback_update(fop_bidask, None, kwargs)
-    for _ in range(100):
-        callback_update(stk_tick, None, kwargs)
-        callback_update(stk_bidask, None, kwargs)
-        callback_update(stk_quote, None, kwargs)
-        callback_update(fop_tick, None, kwargs)
-        callback_update(fop_bidask, None, kwargs)
+    callback_update(stk_bidask, None, kwargs)
+    callback_update(stk_quote, None, kwargs)
+    callback_update(fop_tick, None, kwargs)
+    callback_update(fop_bidask, None, kwargs)
+    for _ in range(1000):
+        # loop.run_in_executor(None, callback_update, stk_tick, None, kwargs)
+        loop.run_in_executor(None, callback_update, stk_bidask, None, kwargs)
+        loop.run_in_executor(None, callback_update, stk_quote, None, kwargs)
+        loop.run_in_executor(None, callback_update, fop_tick, None, kwargs)
+        loop.run_in_executor(None, callback_update, fop_bidask, None, kwargs)
 
 
 test_callback_update()
-sleep(10)
+sleep(50)
