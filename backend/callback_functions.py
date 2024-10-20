@@ -4,7 +4,6 @@ state_lock = threading.RLock()
 
 
 def callback_update(data, args, kwargs):
-    updated_state = None
     with state_lock:
         try:
             state = kwargs['state']
