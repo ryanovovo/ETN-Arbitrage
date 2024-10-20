@@ -15,13 +15,7 @@
             "description": "Select the main program to launch",
             "options": [
                 "main.py",
-                "backend/callback_functions.py",
-                "backend/callback.py",
-                "backend/data.py",
-                "backend/frame.py",
-                "backend/quote.py",
-                "backend/state.py",
-                "backend/utils.py"
+                "test/test_callback_update.py",
             ]
         }
     ]
