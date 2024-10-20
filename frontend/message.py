@@ -3,6 +3,8 @@ def state_to_embed(state):
     # 通過字典鍵訪問 'action' 屬性
     if not isinstance(state, dict):
         state_dict = dict(state)
+    else:
+        state_dict = state
     if state_dict['action'] == 'sell':
         color = discord.Color.green()
     elif state_dict['action'] == 'buy':
