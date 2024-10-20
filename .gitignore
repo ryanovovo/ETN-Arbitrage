@@ -30,3 +30,5 @@ fetchdata/2024-10-17.csv
 fetchdata/fetch_ticks.ipynb
 fetchdata/txfr1_2024_10_18.csv
 environment.yaml
+backend/__pycache__/__init__.cpython-312.pyc
+test/__pycache__/mock_data.cpython-312.pyc
