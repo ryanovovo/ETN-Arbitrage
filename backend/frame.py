@@ -55,6 +55,7 @@ class Frame:
         yield 'timestamp', self.timestamp
         yield 'simtrade', self.simtrade
         yield 'price', self.price
+        yield 'volume', self.volume
         yield 'best_bid', self.best_bid
         yield 'best_ask', self.best_ask
         yield 'underlying_price', self.underlying_price
@@ -83,12 +84,13 @@ class Frame:
             self._quote_to_frame(data)
         if data_type == 'snapshot':
             self._snapshot_to_frame(data)
-        # self.update_close()
+        self.update_pct_chg()
 
     def _snapshot_to_frame(self, snapshot):
         self.price = round(Decimal(snapshot.close), 2)
         self.timestamp = to_datetime(snapshot.ts)
         self.volume = snapshot.volume
+        self.update_pct_chg()
 
     def _tick_to_frame(self, tick):
         self.timestamp = tick.datetime
@@ -102,6 +104,7 @@ class Frame:
         self.simtrade = bidask.simtrade
         self.best_bid = bidask.bid_price[0]
         self.best_ask = bidask.ask_price[0]
+        self.update_pct_chg()
 
     def _quote_to_frame(self, quote):
         self.timestamp = quote.datetime
