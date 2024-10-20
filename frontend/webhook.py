@@ -15,6 +15,13 @@ class WebhookManager:
             raise ValueError("WEBHOOK_URL is required")
 
     def send_embed_message(self, state_dict):
+        if not isinstance(state_dict, dict):
+            state_dict = dict(state_dict)
+        with self.lock:
+            if not self.need_send(state_dict):
+                return True, None
+            else:
+                self.last_sent_state = state_dict
         embed = state_to_embed(state_dict)
         embed_dict = embed.to_dict()
         data_message = {
@@ -23,11 +30,6 @@ class WebhookManager:
         headers = {
             "Content-Type": "application/json"
         }
-        with self.lock:
-            if not self.need_send(state_dict):
-                return True, None
-            else:
-                self.last_sent_state = state_dict
         response = requests.post(self.webhook_url, json=data_message, headers=headers)
         if response.status_code != 204:
             logging.error(f"Failed to send message: {response.text}")
@@ -42,6 +44,6 @@ class WebhookManager:
             return True
         if state_dict['action_price'] != self.last_sent_state['action_price'] and state_dict['action_price'] is not None:
             return True
-        if state_dict['expected_price'] != self.last_sent_state['expected_price'] and state_dict['expected_price'] is not None:
-            return True
+        # if state_dict['expected_price'] != self.last_sent_state['expected_price'] and state_dict['expected_price'] is not None:
+        #     return True
         return False
