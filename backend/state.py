@@ -26,6 +26,23 @@ class State:
         self.future_frame = Frame(api, snapshot_init=True, code=future_code, category='fop')
         self.updated_close_timestamp = None
         self.update_close()
+    
+    def __iter__(self):
+        yield 'stock_frame', dict(self.stock_frame)
+        yield 'future_frame', dict(self.future_frame)
+        yield 'bid_premium_pct', self.bid_premium_pct
+        yield 'ask_discount_pct', self.ask_discount_pct
+        yield 'price_pod_pct', self.price_pod_pct
+        yield 'arbitrage', self.arbitrage
+        yield 'expected_price', self.expected_price
+        yield 'threshold', self.threshold
+        yield 'action', self.action
+        yield 'action_price', self.action_price
+        yield 'expeced_profit', self.expeced_profit
+        yield 'fee', self.fee
+        yield 'fee_discount', self.fee_discount
+        yield 'tax', self.tax
+        yield 'updated_close_timestamp', self.updated_close_timestamp
 
     def get_frame(self, category):
         if category == 'stk':
