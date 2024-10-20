@@ -4,6 +4,7 @@ import dotenv
 import logging
 from threading import RLock
 from frontend.message import state_to_embed
+from copy import deepcopy
 class WebhookManager:
     def __init__(self):
         dotenv.load_dotenv()
@@ -13,8 +14,8 @@ class WebhookManager:
         if self.webhook_url is None:
             raise ValueError("WEBHOOK_URL is required")
 
-    def send_embed_message(self, state):
-        embed = state_to_embed(state)
+    def send_embed_message(self, state_dict):
+        embed = state_to_embed(state_dict)
         embed_dict = embed.to_dict()
         data_message = {
             'embeds': [embed_dict]
@@ -23,9 +24,10 @@ class WebhookManager:
             "Content-Type": "application/json"
         }
         with self.lock:
-            if not self.need_send(state):
+            if not self.need_send(state_dict):
                 return True, None
-            self.last_sent_state = state
+            else:
+                self.last_sent_state = state_dict
         response = requests.post(self.webhook_url, json=data_message, headers=headers)
         if response.status_code != 204:
             logging.error(f"Failed to send message: {response.text}")
@@ -33,14 +35,13 @@ class WebhookManager:
 
         return True, None
     
-    def need_send(self, state):
+    def need_send(self, state_dict):
         if self.last_sent_state is None:
             return True
-        if state.action != self.last_sent_state.action and state.action != None:
+        if state_dict['action'] != self.last_sent_state['action'] and state_dict['action'] is not None:
             return True
-        if state.action_price != self.last_sent_state.action_price and state.action_price != None:
+        if state_dict['action_price'] != self.last_sent_state['action_price'] and state_dict['action_price'] is not None:
             return True
-        if state.expected_price != self.last_sent_state.expected_price and state.expected_price != None:
+        if state_dict['expected_price'] != self.last_sent_state['expected_price'] and state_dict['expected_price'] is not None:
             return True
-        # For debugging
         return False
