@@ -1,15 +1,17 @@
 import discord
 def state_to_embed(state):
     # 通過字典鍵訪問 'action' 屬性
-    if state['action'] == 'sell':
+    if not isinstance(state, dict):
+        state_dict = dict(state)
+    if state_dict['action'] == 'sell':
         color = discord.Color.green()
-    elif state['action'] == 'buy':
+    elif state_dict['action'] == 'buy':
         color = discord.Color.red()
     else:
         color = discord.Color.dark_gray()
     
-    stock_frame = state['stock_frame']
-    future_frame = state['future_frame']
+    stock_frame = state_dict['stock_frame']
+    future_frame = state_dict['future_frame']
 
     # 通過字典鍵訪問 'stock_frame' 的屬性
     if stock_frame['simtrade']:
@@ -27,9 +29,9 @@ def state_to_embed(state):
     else:
         future_mark = ' '
 
-    if state['action'] == 'sell':
+    if state_dict['action'] == 'sell':
         action = '賣出'
-    elif state['action'] == 'buy':
+    elif state_dict['action'] == 'buy':
         action = '買進'
     else:
         action = '無'
@@ -51,13 +53,13 @@ def state_to_embed(state):
     embed.add_field(name="", value="", inline=False)
     embed.add_field(name='最佳買價', value=f"{str(stock_frame['best_bid'])} ({str(stock_frame['bid_pct_chg'])}%)", inline=True)
     embed.add_field(name='最佳賣價', value=f"{str(stock_frame['best_ask'])} ({str(stock_frame['ask_pct_chg'])}%)", inline=True)
-    embed.add_field(name='預期價格', value=str(state['expected_price']), inline=False)
+    embed.add_field(name='預期價格', value=str(state_dict['expected_price']), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
 
     embed.add_field(name='套利機會', value='', inline=False)
     embed.add_field(name='買賣方向', value=action, inline=False) 
-    embed.add_field(name='執行價格', value=str(state['action_price']), inline=False)
-    embed.add_field(name='預期利潤', value=str(state['expeced_profit']), inline=False)
+    embed.add_field(name='執行價格', value=str(state_dict['action_price']), inline=False)
+    embed.add_field(name='預期利潤', value=str(state_dict['expeced_profit']), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
     
     return embed
