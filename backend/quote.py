@@ -14,7 +14,7 @@ class QuoteManager:
         self.api = api
         self.loop = loop
         self.callback_manager = CallbackManager(api, loop, max_tasks)
-        self.data_manager = DataManager(api, max_data_size)
+        # self.data_manager = DataManager(api, max_data_size)
         self.api.quote.set_on_tick_stk_v1_callback(
             self.on_data_received('stk', 'tick')
         )
@@ -37,7 +37,7 @@ class QuoteManager:
 
     def on_data_received(self, category: str, data_type: str):
         def handler(_exchange, data):
-            self.data_manager.add_data(data)
+            # self.data_manager.add_data(data)
             self.callback_manager.run_callbacks(data.code, category, data_type, data)
         return handler
 
@@ -50,7 +50,7 @@ class QuoteManager:
         else:
             raise ValueError(f"Invalid category: {category}")
         self.api.quote.subscribe(contract, data_type)
-        self.data_manager.subscribe(code, category, data_type)
+        # self.data_manager.subscribe(code, category, data_type)
         logging.info(f"Subscribed to {category} {data_type} {code}")
 
     def unsubscribe(self, code: str, category: str, data_type: str):
@@ -62,7 +62,7 @@ class QuoteManager:
         else:
             raise ValueError(f"Invalid category: {category}")
         self.api.quote.unsubscribe(contract, data_type)
-        self.data_manager.unsubscribe(code, category, data_type)
+        # self.data_manager.unsubscribe(code, category, data_type)
         logging.info(f"Unsubscribed from {category} {data_type} {code}")
 
     def add_callback(self,code: str, category: str, data_type: str,
