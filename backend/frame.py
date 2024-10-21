@@ -87,7 +87,9 @@ class Frame:
         self.update_pct_chg()
 
     def _snapshot_to_frame(self, snapshot):
-        self.price = round(Decimal(snapshot.close), 2)
+        if round(Decimal(snapshot.close), 2) != Decimal('0'):
+            self.price = round(Decimal(snapshot.close), 2)
+        # self.price = round(Decimal(snapshot.close), 2)
         self.timestamp = to_datetime(snapshot.ts)
         self.volume = snapshot.volume
         self.update_pct_chg()
@@ -95,7 +97,10 @@ class Frame:
     def _tick_to_frame(self, tick):
         self.timestamp = tick.datetime
         self.simtrade = tick.simtrade
-        self.price = tick.close
+        if tick.close != Decimal('0'):
+            self.price = tick.close
+        else:
+            self.is_snapshot = True
         self.volume = tick.volume
         self.update_pct_chg()
 
@@ -109,7 +114,10 @@ class Frame:
     def _quote_to_frame(self, quote):
         self.timestamp = quote.datetime
         self.simtrade = quote.simtrade
-        self.price = quote.close
+        if quote.close != Decimal('0'):
+            self.price = quote.close
+        else:
+            self.is_snapshot = True
         self.best_bid = quote.bid_price[0]
         self.best_ask = quote.ask_price[0]
         self.update_pct_chg
