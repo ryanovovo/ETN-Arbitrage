@@ -1,4 +1,5 @@
 import threading
+from pprint import pprint
 
 state_lock = threading.RLock()
 
@@ -14,4 +15,4 @@ def callback_update(data, args, kwargs):
     webhook_manager = kwargs.get('webhook_manager')
     if webhook_manager is not None:
         webhook_manager.send_embed_message(updated_state_dict)
-    # pprint(dict(future_frame), sort_dicts=False)
+    # pprint(dict(state.stock_frame), sort_dicts=False)
