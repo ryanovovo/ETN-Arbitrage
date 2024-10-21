@@ -14,11 +14,11 @@ class WebhookManager:
         if self.webhook_url is None:
             raise ValueError("WEBHOOK_URL is required")
 
-    def send_embed_message(self, state_dict):
+    def send_embed_message(self, state_dict, force_send=False):
         if not isinstance(state_dict, dict):
             state_dict = dict(state_dict)
         with self.lock:
-            if not self.need_send(state_dict):
+            if not self.need_send(state_dict) or not force_send:
                 return True, None
             else:
                 self.last_sent_state = state_dict
