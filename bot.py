@@ -86,6 +86,10 @@ class StatusView(View):
             embed.add_field(name='訂閱狀態', value="已訂閱", inline=False)
         else:
             embed.add_field(name='訂閱狀態', value="未訂閱", inline=False)
+        if streaming:
+            embed.add_field(name='串流狀態', value="已啟用", inline=False)
+        else:
+            embed.add_field(name='串流狀態', value="已停止", inline=False)
         embed.add_field(name='收盤價更新時間', value=state.updated_close_timestamp.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
 
         # Edit the last sent message
