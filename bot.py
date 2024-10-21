@@ -90,7 +90,7 @@ class StatusView(View):
 
         # Edit the last sent message
         if last_message:
-            await last_message.edit(content="", embed=embed, view=self)
+            await last_message.edit(embed=embed, view=self)
         await interaction.response.defer()
 
     @discord.ui.button(label="取消訂閱", style=discord.ButtonStyle.danger)
@@ -103,13 +103,13 @@ class StatusView(View):
             quote_manager.unsubscribe(stock_code, 'stk', 'quote')
             embed = discord.Embed(title="已取消訂閱！", color=0xFF0000)
             if last_message:
-                await last_message.edit(content="", embed=embed, view=self)
+                await last_message.edit(embed=embed, view=self)
             await interaction.response.defer()
             is_subscribed = False
         else:
             embed = discord.Embed(title="已取消訂閱！", color=0xFF0000)
             if last_message:
-                await last_message.edit(content="", embed=embed, view=self)
+                await last_message.edit(embed=embed, view=self)
             await interaction.response.defer()
 
     @discord.ui.button(label="套利資訊", style=discord.ButtonStyle.success)
@@ -129,14 +129,14 @@ class StatusView(View):
         global last_message
         if last_message:
             # 編輯之前發送的訊息
-            await last_message.edit(content="", embed=embed, view=self)
+            await last_message.edit(embed=embed, view=self)
         await interaction.response.defer()
 
 class StreamView(View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="開始流傳資訊", style=discord.ButtonStyle.success)
+    @discord.ui.button(label="開始串流", style=discord.ButtonStyle.success)
     async def start_stream(self, interaction: discord.Interaction, button: discord.ui.Button):
         global streaming
         if not streaming:
@@ -144,14 +144,15 @@ class StreamView(View):
             self.stream_embed.start()
         await interaction.response.defer()
 
-    @discord.ui.button(label="結束流傳資訊", style=discord.ButtonStyle.danger)
+    @discord.ui.button(label="結束串流", style=discord.ButtonStyle.danger)
     async def stop_stream(self, interaction: discord.Interaction, button: discord.ui.Button):
         global streaming, last_stream_message
         if streaming:
             streaming = False
             self.stream_embed.stop()
             if last_stream_message:
-                await last_stream_message.delete()
+                stop_embed = discord.Embed(title="已停止串流", color=0xFF0000)
+                await last_stream_message.edit(embed=stop_embed, view=self)
         await interaction.response.defer()
 
     @tasks.loop(seconds=5)
@@ -160,7 +161,7 @@ class StreamView(View):
         if streaming:
             stream_embed = state_to_embed(state)
             if last_stream_message:
-                await last_stream_message.edit(content="", embed=stream_embed, view=self)
+                await last_stream_message.edit(embed=stream_embed, view=self)
 
 @bot.event
 async def on_ready():
@@ -179,7 +180,7 @@ async def on_ready():
         status_view = StatusView()
         global last_message
         # Send initial button message and save it for subsequent editing
-        last_message = await bot_channel.send("請選擇指令:", view=status_view)
+        last_message = await bot_channel.send(view=status_view)
     else:
         print(f"Channel with ID {channel_id} not found.")
         logging.error(f"Channel with ID {channel_id} not found.")
@@ -189,7 +190,7 @@ async def on_ready():
         stream_view = StreamView()
         global last_stream_message
         # Send initial stream message and save it for subsequent editing
-        last_stream_message = await stream_channel.send("流傳套利資訊:", view=stream_view)
+        last_stream_message = await stream_channel.send(view=stream_view)
     else:
         print(f"Channel with ID {stream_channel_id} not found.")
         logging.error(f"Channel with ID {stream_channel_id} not found.")
