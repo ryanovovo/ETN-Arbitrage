@@ -72,6 +72,10 @@ class State:
         self.updated_close_timestamp = datetime.now(pytz.timezone('Asia/Taipei'))
     
     def calculate_arbitrage(self):
+        self.action = None
+        self.action_price = None
+        self.expeced_profit = None
+        self.arbitrage = False
         if self.stock_frame.bid_pct_chg is not None and self.future_frame.price_pct_chg is not None:
             self.bid_premium_pct = self.stock_frame.bid_pct_chg - self.future_frame.price_pct_chg
             if self.bid_premium_pct >= self.threshold:
