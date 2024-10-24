@@ -18,7 +18,7 @@ class WebhookManager:
         if not isinstance(state_dict, dict):
             state_dict = dict(state_dict)
         with self.lock:
-            if not self.need_send(state_dict) or not force_send:
+            if not self.need_send(state_dict) and not force_send:
                 return True, None
             else:
                 self.last_sent_state = state_dict
