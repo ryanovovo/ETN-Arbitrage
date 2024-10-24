@@ -123,8 +123,12 @@ class Frame:
         self.update_pct_chg
 
     def update_pct_chg(self):
+        self.price_pct_chg = None
+        self.bid_pct_chg = None
+        self.ask_pct_chg = None
         if self.close is not None and self.close != Decimal('0'):
-            self.price_pct_chg = round((self.price - self.close) / self.close * 100, 2)
+            if self.price is not None and self.price != Decimal('0'):
+                self.price_pct_chg = round((self.price - self.close) / self.close * 100, 2)
             if self.best_bid is not None and self.best_bid != Decimal('0'):
                 self.bid_pct_chg = round((self.best_bid - self.close) / self.close * 100, 2)
             if self.best_ask is not None and self.best_ask != Decimal('0'):
