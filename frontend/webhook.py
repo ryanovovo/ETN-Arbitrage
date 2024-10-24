@@ -39,7 +39,9 @@ class WebhookManager:
     
     def need_send(self, state_dict):
         if self.last_sent_state is None:
-            return True
+            if state_dict['action'] is not None:
+                return True
+            return False
         if state_dict['action'] != self.last_sent_state['action'] and state_dict['action'] is not None:
             return True
         if state_dict['action_price'] != self.last_sent_state['action_price'] and state_dict['action_price'] is not None:
