@@ -1,8 +1,6 @@
 import asyncio
 from backend.callback import CallbackManager
-from backend.data_redis import DataManager
 import logging
-import signal
 
 
 class QuoteManager:
