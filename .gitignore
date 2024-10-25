@@ -33,3 +33,4 @@ environment.yaml
 backend/__pycache__/__init__.cpython-312.pyc
 test/__pycache__/mock_data.cpython-312.pyc
 tmp.ipynb
+frontend/__pycache__/console.cpython-312.pyc
