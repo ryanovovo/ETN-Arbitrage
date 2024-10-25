@@ -45,7 +45,7 @@ quote_manager.subscribe(future_code, 'fop', 'tick')
 quote_manager.subscribe(future_code, 'fop', 'bidask')
 quote_manager.subscribe(stock_code, 'stk', 'quote')
 quote_manager.add_callback(future_code, 'fop', 'tick', callback_update_terminal, state=state, console_manager=console_manager)
-quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
+# quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
 quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update_terminal, state=state, console_manager=console_manager)
 
 
