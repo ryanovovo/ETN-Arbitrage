@@ -6,7 +6,7 @@ from backend.quote import QuoteManager
 from backend.utils import get_api, periodic_get_close
 from backend.frame import Frame
 from backend.state import State
-from backend.callback_functions import callback_update
+from backend.callback_functions import callback_update_terminal
 from frontend.webhook import WebhookManager
 from frontend.message import state_to_embed
 from frontend.console import ConsoleManager
@@ -44,9 +44,9 @@ state = State(api, stock_code=stock_code, future_code=future_code)
 quote_manager.subscribe(future_code, 'fop', 'tick')
 quote_manager.subscribe(future_code, 'fop', 'bidask')
 quote_manager.subscribe(stock_code, 'stk', 'quote')
-quote_manager.add_callback(future_code, 'fop', 'tick', callback_update, state=state, console_manager=console_manager)
-quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update, state=state, console_manager=console_manager)
-quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update, state=state, console_manager=console_manager)
+quote_manager.add_callback(future_code, 'fop', 'tick', callback_update_terminal, state=state, console_manager=console_manager)
+quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
+quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update_terminal, state=state, console_manager=console_manager)
 
 
 loop.create_task(periodic_get_close(state, hours=12))
