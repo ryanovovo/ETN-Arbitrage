@@ -32,10 +32,12 @@ state = State(api, stock_code=stock_code, future_code=future_code)
 # Subscribe and set callback functions
 quote_manager.subscribe(future_code, 'fop', 'tick')
 quote_manager.subscribe(future_code, 'fop', 'bidask')
-quote_manager.subscribe(stock_code, 'stk', 'quote')
+quote_manager.subscribe(stock_code, 'stk', 'tick')
+quote_manager.subscribe(stock_code, 'stk', 'bidask')
 quote_manager.add_callback(future_code, 'fop', 'tick', callback_update_terminal, state=state, console_manager=console_manager)
-# quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
-quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update_terminal, state=state, console_manager=console_manager)
+quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
+quote_manager.add_callback(stock_code, 'stk', 'tick', callback_update_terminal, state=state, console_manager=console_manager)
+quote_manager.add_callback(stock_code, 'stk', 'bidask', callback_update_terminal, state=state, console_manager=console_manager)
 
 
 loop.create_task(periodic_get_close(state, hours=12))
