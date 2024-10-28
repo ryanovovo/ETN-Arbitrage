@@ -120,6 +120,7 @@ class Frame:
             self.price = None
         self.best_bid = quote.bid_price[0]
         self.best_ask = quote.ask_price[0]
+        self.volume = quote.volume
         self.update_pct_chg
 
     def update_pct_chg(self):
