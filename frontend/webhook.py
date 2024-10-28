@@ -48,6 +48,6 @@ class WebhookManager:
             return True
         # if state_dict['expected_price'] != self.last_sent_state['expected_price'] and state_dict['expected_price'] is not None:
         #     return True
-        if state_dict['expeced_profit'] != self.last_sent_state['expeced_profit'] and state_dict['expeced_profit'] is not None:
+        if state_dict['expected_profit'] != self.last_sent_state['expected_profit'] and state_dict['expected_profit'] is not None:
             return True
         return False
