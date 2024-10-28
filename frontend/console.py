@@ -36,7 +36,7 @@ class ConsoleManager:
 
         # 獲取當前時間
         now = datetime.now()
-        if now - self.last_clear > timedelta(seconds=0.5):
+        if now - self.last_clear > timedelta(seconds=10.0):
             self.stdscr.clear()
             self.last_clear = now
 
