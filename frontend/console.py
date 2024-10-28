@@ -42,7 +42,7 @@ class ConsoleManager:
 
         # 輸出資訊到終端，每次輸出後用設定好的空格來確保覆蓋舊的內容
         self.stdscr.addstr(0, 0, f"市場資訊 {now}{self.padding}")
-        self.stdscr.addstr(1, 0, '-'*40 + self.padding)
+        self.stdscr.addstr(1, 0, '-'*40)
 
         # 新增台灣加權指數顯示
         self.stdscr.addstr(2, 0, f"台灣加權指數: {future_frame['underlying_price']}{self.padding}")
@@ -54,7 +54,7 @@ class ConsoleManager:
         self.stdscr.addstr(5, 0, f"時間: {future_frame['timestamp']}{self.padding}")
         self.stdscr.addstr(6, 0, f"台指期現貨同步收盤價: {future_frame['close']}{self.padding}")
         self.stdscr.addstr(7, 0, f"最新成交價: {future_frame['price']}{future_mark} ({future_frame['price_pct_chg']}%){self.padding}")
-        self.stdscr.addstr(8, 0, '-'*40 + self.padding)
+        self.stdscr.addstr(8, 0, '-'*40)
         self.stdscr.addstr(9, 0, "ETN資訊" + self.padding)
         self.stdscr.addstr(10, 0, f"時間: {stock_frame['timestamp']}{self.padding}")
         self.stdscr.addstr(11, 0, f"成交價: {stock_frame['price']}{stock_mark} ({stock_frame['price_pct_chg']}%){self.padding}")
@@ -62,12 +62,12 @@ class ConsoleManager:
         self.stdscr.addstr(13, 0, f"最佳買價: {stock_frame['best_bid']} ({stock_frame['bid_pct_chg']}%){self.padding}")
         self.stdscr.addstr(14, 0, f"最佳賣價: {stock_frame['best_ask']} ({stock_frame['ask_pct_chg']}%){self.padding}")
         self.stdscr.addstr(15, 0, f"預期價格: {state_dict['expected_price']}{self.padding}")
-        self.stdscr.addstr(16, 0, '-'*40 + self.padding)
+        self.stdscr.addstr(16, 0, '-'*40)
         self.stdscr.addstr(17, 0, "套利機會" + self.padding)
         self.stdscr.addstr(18, 0, f"買賣方向: {action}{self.padding}")
         self.stdscr.addstr(19, 0, f"執行價格: {state_dict['action_price']}{self.padding}")
-        self.stdscr.addstr(20, 0, f"預期利潤: {state_dict['expeced_profit']}{self.padding}")
-        self.stdscr.addstr(21, 0, '-'*40 + self.padding)
+        self.stdscr.addstr(20, 0, f"預期利潤: {state_dict['expected_profit']}{self.padding}")
+        self.stdscr.addstr(21, 0, '-'*40)
 
         # 刷新終端顯示
         self.stdscr.refresh()
