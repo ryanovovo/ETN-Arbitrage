@@ -61,7 +61,7 @@ def state_to_embed(state):
     embed.add_field(name='套利機會', value='', inline=False)
     embed.add_field(name='買賣方向', value=action, inline=False) 
     embed.add_field(name='執行價格', value=str(state_dict['action_price']), inline=False)
-    embed.add_field(name='預期利潤', value=str(state_dict['expeced_profit']), inline=False)
+    embed.add_field(name='預期利潤', value=str(state_dict['expected_profit']), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
     
     return embed
