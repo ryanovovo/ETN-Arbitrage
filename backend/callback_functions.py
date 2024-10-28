@@ -1,5 +1,6 @@
 import threading
 from pprint import pprint
+import copy
 
 state_lock = threading.RLock()
 
@@ -25,6 +26,6 @@ def callback_update_terminal(data, args, kwargs):
             raise ValueError("State is required")
         state.update_frame(data)
         updated_state_dict = dict(state)
-    console_manager = kwargs.get('console_manager')
-    if console_manager is not None:
-        console_manager.state_to_terminal(updated_state_dict)
+        console_manager = kwargs.get('console_manager')
+        if console_manager is not None:
+            console_manager.state_to_terminal(updated_state_dict)
