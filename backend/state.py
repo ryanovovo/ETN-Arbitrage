@@ -18,7 +18,7 @@ class State:
         self.threshold = Decimal('0.5')
         self.action = None
         self.action_price = None
-        self.expeced_profit = None
+        self.expected_profit = None
         self.fee = Decimal('0.001425')
         self.fee_discount = Decimal('0.2')
         self.tax = Decimal('0.001')
@@ -38,7 +38,7 @@ class State:
         yield 'threshold', self.threshold
         yield 'action', self.action
         yield 'action_price', self.action_price
-        yield 'expeced_profit', self.expeced_profit
+        yield 'expected_profit', self.expected_profit
         yield 'fee', self.fee
         yield 'fee_discount', self.fee_discount
         yield 'tax', self.tax
@@ -74,7 +74,7 @@ class State:
     def calculate_arbitrage(self):
         self.action = None
         self.action_price = None
-        self.expeced_profit = None
+        self.expected_profit = None
         self.arbitrage = False
         if self.stock_frame.bid_pct_chg is not None and self.future_frame.price_pct_chg is not None:
             self.bid_premium_pct = self.stock_frame.bid_pct_chg - self.future_frame.price_pct_chg
@@ -87,9 +87,9 @@ class State:
                     total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
                                 self.expected_price * (self.fee * self.fee_discount)) * \
                                 1000 * self.stock_frame.volume
-                    self.expeced_profit = pre_fee_profit - total_fee
+                    self.expected_profit = pre_fee_profit - total_fee
                 else:
-                    self.expeced_profit = None
+                    self.expected_profit = None
         else:
             self.bid_premium_pct = None
         
@@ -104,14 +104,14 @@ class State:
                     total_fee = (self.action_price * (self.fee * self.fee_discount) + \
                                 self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
                                 1000 * self.stock_frame.volume
-                    self.expeced_profit = pre_fee_profit - total_fee
+                    self.expected_profit = pre_fee_profit - total_fee
                 else:
-                    self.expeced_profit = None
+                    self.expected_profit = None
         else:
             self.ask_discount_pct = None
     
         self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
-        self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 2)
+        self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
 
         if self.stock_frame.simtrade:
             if self.price_pod_pct >= self.threshold:
@@ -123,9 +123,9 @@ class State:
                     total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
                                 self.expected_price * (self.fee * self.fee_discount)) * \
                                 1000 * self.stock_frame.volume
-                    self.expeced_profit = pre_fee_profit - total_fee
+                    self.expected_profit = pre_fee_profit - total_fee
                 else:
-                    self.expeced_profit = None
+                    self.expected_profit = None
             elif self.price_pod_pct <= -self.threshold:
                 self.arbitrage = True
                 self.action = 'buy'
@@ -135,10 +135,10 @@ class State:
                     total_fee = (self.action_price * (self.fee * self.fee_discount) + \
                                 self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
                                 1000 * self.stock_frame.volume
-                    self.expeced_profit = pre_fee_profit - total_fee
+                    self.expected_profit = pre_fee_profit - total_fee
                 else:
-                    self.expeced_profit = None
-        if self.expeced_profit is not None:
-            self.expeced_profit = round(self.expeced_profit, 2)
+                    self.expected_profit = None
+        if self.expected_profit is not None:
+            self.expected_profit = round(self.expected_profit, 2)
 
         
