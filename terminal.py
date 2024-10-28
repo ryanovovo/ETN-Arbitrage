@@ -1,23 +1,12 @@
 # Import necessary libraries and modules
 import asyncio
 import logging
-from decimal import Decimal
 from backend.quote import QuoteManager
 from backend.utils import get_api, periodic_get_close
-from backend.frame import Frame
 from backend.state import State
 from backend.callback_functions import callback_update_terminal
-from frontend.webhook import WebhookManager
-from frontend.message import state_to_embed
 from frontend.console import ConsoleManager
-import discord
-from discord.ext import commands, tasks
-from discord.ui import Button, View
-import os
-from dotenv import load_dotenv
 import signal
-from datetime import datetime, timedelta
-import pytz
 
 # Set up logging
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
