@@ -41,10 +41,12 @@ webhook_manager = WebhookManager()
 # Subscribe and set callback functions
 quote_manager.subscribe(future_code, 'fop', 'tick')
 quote_manager.subscribe(future_code, 'fop', 'bidask')
-quote_manager.subscribe(stock_code, 'stk', 'quote')
+quote_manager.subscribe(stock_code, 'stk', 'tick')
+quote_manager.subscribe(stock_code, 'stk', 'bidask')
 quote_manager.add_callback(future_code, 'fop', 'tick', callback_update, state=state, webhook_manager=webhook_manager)
 quote_manager.add_callback(future_code, 'fop', 'bidask', callback_update, state=state, webhook_manager=webhook_manager)
-quote_manager.add_callback(stock_code, 'stk', 'quote', callback_update, state=state, webhook_manager=webhook_manager)
+quote_manager.add_callback(stock_code, 'stk', 'tick', callback_update, state=state, webhook_manager=webhook_manager)
+quote_manager.add_callback(stock_code, 'stk', 'bidask', callback_update, state=state, webhook_manager=webhook_manager)
 
 # Initialize Discord bot
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
