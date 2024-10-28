@@ -100,7 +100,7 @@ class Frame:
         if tick.close != Decimal('0'):
             self.price = tick.close
         else:
-            self.is_snapshot = True
+            self.price = None
         self.volume = tick.volume
         self.update_pct_chg()
 
@@ -117,7 +117,7 @@ class Frame:
         if quote.close != Decimal('0'):
             self.price = quote.close
         else:
-            self.is_snapshot = True
+            self.price = None
         self.best_bid = quote.bid_price[0]
         self.best_ask = quote.ask_price[0]
         self.update_pct_chg
