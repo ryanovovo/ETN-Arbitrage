@@ -92,9 +92,11 @@ class Frame:
         now = datetime.now(pytz.timezone('Asia/Taipei'))
         self.timestamp = to_datetime(snapshot.ts)
         self.timestamp = self.timestamp.tz_localize('Asia/Taipei')
-        if now - self.timestamp > timedelta(hours=6):
+        if now - self.timestamp > timedelta(minutes=10):
             self.price = None
             self.volume = None
+            self.is_snapshot = False
+            self.timestamp = None
             return
         if round(Decimal(snapshot.close), 2) != Decimal('0'):
             self.price = round(Decimal(snapshot.close), 2)
