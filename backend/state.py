@@ -109,35 +109,36 @@ class State:
                     self.expected_profit = None
         else:
             self.ask_discount_pct = None
-    
-        self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
-        self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
 
-        if self.stock_frame.simtrade:
-            if self.price_pod_pct >= self.threshold:
-                self.arbitrage = True
-                self.action = 'sell'
-                self.action_price = self.stock_frame.price
-                if self.stock_frame.volume is not None:
-                    pre_fee_profit = (self.action_price - self.expected_price) * 1000 * self.stock_frame.volume
-                    total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
-                                self.expected_price * (self.fee * self.fee_discount)) * \
-                                1000 * self.stock_frame.volume
-                    self.expected_profit = pre_fee_profit - total_fee
-                else:
-                    self.expected_profit = None
-            elif self.price_pod_pct <= -self.threshold:
-                self.arbitrage = True
-                self.action = 'buy'
-                self.action_price = self.stock_frame.price
-                if self.stock_frame.volume is not None:
-                    pre_fee_profit = (self.expected_price - self.action_price) * 1000 * self.stock_frame.volume
-                    total_fee = (self.action_price * (self.fee * self.fee_discount) + \
-                                self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
-                                1000 * self.stock_frame.volume
-                    self.expected_profit = pre_fee_profit - total_fee
-                else:
-                    self.expected_profit = None
+        if self.stock_frame.price_pct_chg is not None and self.future_frame.price_pct_chg is not None:
+            self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
+            self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
+
+            if self.stock_frame.simtrade:
+                if self.price_pod_pct >= self.threshold:
+                    self.arbitrage = True
+                    self.action = 'sell'
+                    self.action_price = self.stock_frame.price
+                    if self.stock_frame.volume is not None:
+                        pre_fee_profit = (self.action_price - self.expected_price) * 1000 * self.stock_frame.volume
+                        total_fee = (self.action_price * (self.fee * self.fee_discount + self.tax) + \
+                                    self.expected_price * (self.fee * self.fee_discount)) * \
+                                    1000 * self.stock_frame.volume
+                        self.expected_profit = pre_fee_profit - total_fee
+                    else:
+                        self.expected_profit = None
+                elif self.price_pod_pct <= -self.threshold:
+                    self.arbitrage = True
+                    self.action = 'buy'
+                    self.action_price = self.stock_frame.price
+                    if self.stock_frame.volume is not None:
+                        pre_fee_profit = (self.expected_price - self.action_price) * 1000 * self.stock_frame.volume
+                        total_fee = (self.action_price * (self.fee * self.fee_discount) + \
+                                    self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
+                                    1000 * self.stock_frame.volume
+                        self.expected_profit = pre_fee_profit - total_fee
+                    else:
+                        self.expected_profit = None
         if self.expected_profit is not None:
             self.expected_profit = round(self.expected_profit, 2)
 
