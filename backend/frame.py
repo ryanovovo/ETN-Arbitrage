@@ -1,6 +1,8 @@
 from decimal import Decimal
 from pandas import to_datetime
 from backend.utils import get_data_type, get_snapshot, get_close
+from datetime import datetime, timedelta
+import pytz
 
 
 class Frame:
@@ -87,10 +89,16 @@ class Frame:
         self.update_pct_chg()
 
     def _snapshot_to_frame(self, snapshot):
+        now = datetime.now(pytz.timezone('Asia/Taipei'))
+        self.timestamp = to_datetime(snapshot.ts)
+        self.timestamp = self.timestamp.tz_localize('Asia/Taipei')
+        if now - self.timestamp > timedelta(hours=6):
+            self.price = None
+            self.volume = None
+            return
         if round(Decimal(snapshot.close), 2) != Decimal('0'):
             self.price = round(Decimal(snapshot.close), 2)
         # self.price = round(Decimal(snapshot.close), 2)
-        self.timestamp = to_datetime(snapshot.ts)
         self.volume = snapshot.volume
         self.update_pct_chg()
 
