@@ -8,6 +8,11 @@ class ConsoleManager:
         self.padding = ' ' * padding_length  # 設置空格填充
         self.last_clear = datetime.now()
 
+        # 初始化顏色組合
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)  # 紅色
+        curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)  # 綠色
+
     def close_dynamic_print(self):
         # 結束 curses 操作並恢復終端
         if self.stdscr:
@@ -64,11 +69,20 @@ class ConsoleManager:
         self.stdscr.addstr(15, 0, f"預期價格: {state_dict['expected_price']}{self.padding}")
         self.stdscr.addstr(16, 0, '-'*40)
         self.stdscr.addstr(17, 0, "套利機會" + self.padding)
-        self.stdscr.addstr(18, 0, f"買賣方向: {action}{self.padding}")
-        self.stdscr.addstr(19, 0, f"執行價格: {state_dict['action_price']}{self.padding}")
-        self.stdscr.addstr(20, 0, f"預期利潤: {state_dict['expected_profit']}{self.padding}")
+
+        # 根據「買賣方向」顯示不同顏色
+        if state_dict['action'] == 'buy':
+            color_pair = curses.color_pair(1)  # 紅色
+        elif state_dict['action'] == 'sell':
+            color_pair = curses.color_pair(2)  # 綠色
+        else:
+            color_pair = curses.color_pair(0)  # 預設顏色
+
+        self.stdscr.addstr(18, 0, f"買賣方向: {action}{self.padding}", color_pair)
+        self.stdscr.addstr(19, 0, f"執行價格: {state_dict['action_price']}{self.padding}", color_pair)
+        self.stdscr.addstr(20, 0, f"預期利潤: {state_dict['expected_profit']}{self.padding}", color_pair)
+        
         self.stdscr.addstr(21, 0, '-'*40)
 
         # 刷新終端顯示
         self.stdscr.refresh()
-
