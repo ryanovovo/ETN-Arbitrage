@@ -110,9 +110,11 @@ class State:
         else:
             self.ask_discount_pct = None
 
+        if self.stock_frame.close is not None and self.future_frame.price_pct_chg is not None:
+            self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
+
         if self.stock_frame.price_pct_chg is not None and self.future_frame.price_pct_chg is not None:
             self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
-            self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
 
             if self.stock_frame.simtrade:
                 if self.price_pod_pct >= self.threshold:
