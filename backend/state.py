@@ -127,8 +127,8 @@ class State:
                 else:
                     self.ask_expected_profit[i] = None
             else:
-                self.ask_discount_pct = [None] * 5
-                self.ask_expected_profit = [None] * 5
+                self.ask_discount_pct[i] = None
+                self.ask_expected_profit[i] = None
 
 
         if self.stock_frame.price_pct_chg is not None and self.future_frame.price_pct_chg is not None:
