@@ -1,6 +1,6 @@
 from decimal import Decimal
 from pandas import to_datetime
-from backend.utils import get_data_type, get_snapshot, get_close
+from backend.utils import get_data_type, get_snapshot
 from datetime import datetime, timedelta
 import pytz
 
@@ -23,8 +23,10 @@ class Frame:
         self.volume = None
 
         # bidask attributes
-        self.best_bid = None
-        self.best_ask = None
+        self.bid_price = [None] * 5
+        self.ask_price = [None] * 5
+        self.bid_volume = [None] * 5
+        self.ask_volume = [None] * 5
 
         # future option attributes
         self.underlying_price = None  # none for snapshot
@@ -32,8 +34,8 @@ class Frame:
         # Other attributes
         self.close = None
         self.price_pct_chg = None
-        self.bid_pct_chg = None
-        self.ask_pct_chg = None
+        self.bid_pct_chg = [None] * 5
+        self.ask_pct_chg = [None] * 5
 
         if snapshot_init:
             if api is None:
@@ -58,8 +60,10 @@ class Frame:
         yield 'simtrade', self.simtrade
         yield 'price', self.price
         yield 'volume', self.volume
-        yield 'best_bid', self.best_bid
-        yield 'best_ask', self.best_ask
+        yield 'bid_price', self.bid_price
+        yield 'ask_price', self.ask_price
+        yield 'bid_volume', self.bid_volume
+        yield 'ask_volume', self.ask_volume
         yield 'underlying_price', self.underlying_price
         yield 'close', self.close
         yield 'price_pct_chg', self.price_pct_chg
@@ -116,8 +120,10 @@ class Frame:
     def _bidask_to_frame(self, bidask):
         self.timestamp = bidask.datetime
         self.simtrade = bidask.simtrade
-        self.best_bid = bidask.bid_price[0]
-        self.best_ask = bidask.ask_price[0]
+        self.bid_price = bidask.bid_price
+        self.ask_price = bidask.ask_price
+        self.bid_volume = bidask.bid_volume
+        self.ask_volume = bidask.ask_volume
         self.update_pct_chg()
 
     def _quote_to_frame(self, quote):
@@ -127,24 +133,32 @@ class Frame:
             self.price = quote.close
         else:
             self.price = None
-        self.best_bid = quote.bid_price[0]
-        self.best_ask = quote.ask_price[0]
+        self.bid_price = quote.bid_price
+        self.ask_price = quote.ask_price
+        self.bid_volume = quote.bid_volume
+        self.ask_volume = quote.ask_volume
         self.volume = quote.volume
-        self.update_pct_chg
+        self.update_pct_chg()
 
     def update_pct_chg(self):
         self.price_pct_chg = None
-        self.bid_pct_chg = None
-        self.ask_pct_chg = None
+        self.bid_pct_chg = [None] * 5
+        self.ask_pct_chg = [None] * 5
         if self.close is not None and self.close != Decimal('0'):
             if self.price is not None and self.price != Decimal('0'):
                 self.price_pct_chg = round((self.price - self.close) / self.close * 100, 2)
-            if self.best_bid is not None and self.best_bid != Decimal('0'):
-                self.bid_pct_chg = round((self.best_bid - self.close) / self.close * 100, 2)
-            if self.best_ask is not None and self.best_ask != Decimal('0'):
-                self.ask_pct_chg = round((self.best_ask - self.close) / self.close * 100, 2)
-
-    def __update_close(self):
-        close = get_close(self.api, self.code, self.category, sync=True)
-        self.close = round(Decimal(close), 2)
-        self.update_pct_chg()
+            else:
+                self.price_pct_chg = None
+            for i in range(5):
+                if self.bid_price[i] is not None and self.bid_price[i] != Decimal('0'):
+                    self.bid_pct_chg[i] = round((self.bid_price[i] - self.close) / self.close * 100, 2)
+                else:
+                    self.bid_pct_chg[i] = None
+                if self.ask_price[i] is not None and self.ask_price[i] != Decimal('0'):
+                    self.ask_pct_chg[i] = round((self.ask_price[i] - self.close) / self.close * 100, 2)
+                else:
+                    self.ask_pct_chg[i] = None
+        else:
+            self.price_pct_chg = None
+            self.bid_pct_chg = [None] * 5
+            self.ask_pct_chg = [None] * 5
