@@ -53,8 +53,8 @@ def state_to_embed(state):
     embed.add_field(name='成交價', value=f"{str(stock_frame['price'])}{stock_mark}({str(stock_frame['price_pct_chg'])}%)", inline=True)
     embed.add_field(name='成交量', value=str(stock_frame.get('volume', 'N/A')), inline=True)
     embed.add_field(name="", value="", inline=False)
-    embed.add_field(name='最佳買價', value=f"{str(stock_frame['best_bid'])} ({str(stock_frame['bid_pct_chg'])}%)", inline=True)
-    embed.add_field(name='最佳賣價', value=f"{str(stock_frame['best_ask'])} ({str(stock_frame['ask_pct_chg'])}%)", inline=True)
+    embed.add_field(name='最佳買價', value=f"{str(stock_frame['bid_price'][0])} ({str(stock_frame['bid_pct_chg'])}%)", inline=True)
+    embed.add_field(name='最佳賣價', value=f"{str(stock_frame['ask_price'][0])} ({str(stock_frame['ask_pct_chg'])}%)", inline=True)
     embed.add_field(name='預期價格', value=str(state_dict['expected_price']), inline=False)
     embed.add_field(name='-'*40, value='', inline=False)
 
