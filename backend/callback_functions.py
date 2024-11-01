@@ -28,4 +28,6 @@ def callback_update_terminal(data, args, kwargs):
         updated_state_dict = dict(state)
         console_manager = kwargs.get('console_manager')
         if console_manager is not None:
-            console_manager.state_to_terminal(updated_state_dict)
+            # print(updated_state_dict)
+            # console_manager.state_to_terminal(updated_state_dict)
+            console_manager.state_to_debug(updated_state_dict)
