@@ -28,6 +28,7 @@ future_code = 'TXFR1'
 # future_code = get_nearmonth_future_code(api, future_code)
 
 state = State(api, stock_code=stock_code, future_code=future_code)
+console_manager.state_to_debug(dict(state))
 
 # Subscribe and set callback functions
 quote_manager.subscribe(future_code, 'fop', 'tick')
