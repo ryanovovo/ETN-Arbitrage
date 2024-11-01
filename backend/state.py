@@ -8,6 +8,7 @@ import pytz
 class State:
     def __init__(self, api, stock_code, future_code):
         self.api = api
+        self.balance = Decimal('100000')
         self.stock_frame = None
         self.future_frame = None
         self.bid_premium_pct = [None] * 5
@@ -33,21 +34,22 @@ class State:
         self.update_close()
     
     def __iter__(self):
+        yield 'balance', self.balance
         yield 'stock_frame', dict(self.stock_frame)
         yield 'future_frame', dict(self.future_frame)
-        yield 'bid_premium_pct', self.bid_premium_pct
-        yield 'ask_discount_pct', self.ask_discount_pct
-        yield 'price_pod_pct', self.price_pod_pct
+        yield 'bid_premium_pct', [round(value, 2) if value is not None else None for value in self.bid_premium_pct]
+        yield 'ask_discount_pct', [round(value, 2) if value is not None else None for value in self.ask_discount_pct]
+        yield 'price_pod_pct', round(self.price_pod_pct, 2) if self.price_pod_pct is not None else None
         yield 'arbitrage', self.arbitrage
         yield 'expected_price', self.expected_price
         yield 'threshold', self.threshold
         yield 'action', self.action
         yield 'action_price', self.action_price
-        yield 'expected_profit', self.expected_profit
-        yield 'bid_expected_profit', self.bid_expected_profit
-        yield 'ask_expected_profit', self.ask_expected_profit
-        yield 'price_sell_expected_profit', self.price_sell_expected_profit
-        yield 'price_buy_expected_profit', self.price_buy_expected_profit
+        yield 'expected_profit', round(self.expected_profit, 2) if self.expected_profit is not None else None
+        yield 'bid_expected_profit', [round(value, 2) if value is not None else None for value in self.bid_expected_profit]
+        yield 'ask_expected_profit', [round(value, 2) if value is not None else None for value in self.ask_expected_profit]
+        yield 'price_sell_expected_profit', round(self.price_sell_expected_profit, 2) if self.price_sell_expected_profit is not None else None
+        yield 'price_buy_expected_profit', round(self.price_buy_expected_profit, 2) if self.price_buy_expected_profit is not None else None
         yield 'fee', self.fee
         yield 'fee_discount', self.fee_discount
         yield 'tax', self.tax
@@ -98,10 +100,11 @@ class State:
             if self.stock_frame.bid_pct_chg[i] is not None and self.future_frame.price_pct_chg is not None:
                 self.bid_premium_pct[i] = self.stock_frame.bid_pct_chg[i] - self.future_frame.price_pct_chg
                 if self.stock_frame.bid_price[i] is not None and self.stock_frame.bid_volume[i] is not None:
-                    pre_fee_profit = (self.stock_frame.bid_price[i] - self.expected_price) * 1000 * self.stock_frame.bid_volume[i]
+                    max_sell_volume = min(sum(self.stock_frame.bid_volume[:i+1]), self.stock_frame.quantity)
+                    pre_fee_profit = (self.stock_frame.bid_price[i] - self.expected_price) * 1000 * max_sell_volume
                     total_fee = (self.stock_frame.bid_price[i] * (self.fee * self.fee_discount + self.tax) + \
                                 self.expected_price * (self.fee * self.fee_discount)) * \
-                                1000 * self.stock_frame.bid_volume[i]
+                                1000 * max_sell_volume
                     self.bid_expected_profit[i] = pre_fee_profit - total_fee
                 else:
                     self.bid_expected_profit[i] = None
@@ -115,10 +118,11 @@ class State:
                 # if self.ask_discount_pct[i] <= -self.threshold:
             
                 if self.stock_frame.ask_price[i] is not None and self.stock_frame.ask_volume[i] is not None:
-                    pre_fee_profit = (self.expected_price - self.stock_frame.ask_price[i]) * 1000 * self.stock_frame.ask_volume[i]
+                    max_buy_volume = min(sum(self.stock_frame.ask_volume[:i+1]), self.balance // (self.stock_frame.ask_price[i] * 1000))
+                    pre_fee_profit = (self.expected_price - self.stock_frame.ask_price[i]) * 1000 * max_buy_volume
                     total_fee = (self.stock_frame.ask_price[i] * (self.fee * self.fee_discount) + \
                                 self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
-                                1000 * self.stock_frame.ask_volume[i]
+                                1000 * max_buy_volume
                     self.ask_expected_profit[i] = pre_fee_profit - total_fee
                 else:
                     self.ask_expected_profit[i] = None
@@ -131,12 +135,14 @@ class State:
             self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
 
             if self.stock_frame.simtrade:
-                pre_fee_sell_profit = (self.stock_frame.price - self.expected_price) * 1000
-                pre_fee_buy_profit = (self.expected_price - self.stock_frame.price) * 1000
+                max_sell_volume = min(self.stock_frame.quantity, self.stock_frame.volume)
+                max_buy_volume = min(self.balance // (self.stock_frame.price * 1000), self.stock_frame.volume)
+                pre_fee_sell_profit = (self.stock_frame.price - self.expected_price - self.slippage) * 1000 * max_sell_volume
+                pre_fee_buy_profit = (self.expected_price - self.stock_frame.price - self.slippage) * 1000 * max_buy_volume
                 sell_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount + self.tax) + \
-                            self.expected_price * (self.fee * self.fee_discount)) * 1000
+                            self.expected_price * (self.fee * self.fee_discount)) * 1000 * max_sell_volume
                 buy_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount) + \
-                            self.expected_price * (self.fee * self.fee_discount + self.tax)) * 1000
+                            self.expected_price * (self.fee * self.fee_discount + self.tax)) * 1000 * max_buy_volume
                 self.price_sell_expected_profit = pre_fee_sell_profit - sell_total_fee
                 self.price_buy_expected_profit = pre_fee_buy_profit - buy_total_fee
         else:
