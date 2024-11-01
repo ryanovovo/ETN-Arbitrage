@@ -104,8 +104,16 @@ class Frame:
             return
         if round(Decimal(snapshot.close), 2) != Decimal('0'):
             self.price = round(Decimal(snapshot.close), 2)
-        # self.price = round(Decimal(snapshot.close), 2)
-        self.volume = snapshot.volume
+        if round(Decimal(snapshot.volume), 0) != Decimal('0'):
+            self.volume = round(Decimal(snapshot.volume), 0)
+        if round(Decimal(snapshot.buy_price), 2) != Decimal('0'):
+            self.bid_price[0] = round(Decimal(snapshot.buy_price), 2)
+        if round(Decimal(snapshot.sell_price), 2) != Decimal('0'):
+            self.ask_price[0] = round(Decimal(snapshot.sell_price), 2)
+        if round(Decimal(snapshot.buy_volume), 0) != Decimal('0'):
+            self.bid_volume[0] = round(Decimal(snapshot.buy_volume), 0)
+        if round(Decimal(snapshot.sell_volume), 0) != Decimal('0'):
+            self.ask_volume[0] = round(Decimal(snapshot.sell_volume), 0)
         self.update_pct_chg()
 
     def _tick_to_frame(self, tick):
