@@ -10,6 +10,7 @@ class Frame:
         # common attributes
         self.api = api
         self.code = code
+        self.quantity = Decimal('16')
         self.data_type = None
         self.category = category
         self.is_snapshot = None
@@ -66,9 +67,9 @@ class Frame:
         yield 'ask_volume', self.ask_volume
         yield 'underlying_price', self.underlying_price
         yield 'close', self.close
-        yield 'price_pct_chg', self.price_pct_chg
-        yield 'bid_pct_chg', self.bid_pct_chg
-        yield 'ask_pct_chg', self.ask_pct_chg
+        yield 'price_pct_chg', round(self.price_pct_chg, 2) if self.price_pct_chg is not None else None
+        yield 'bid_pct_chg', [round(value, 2) if value is not None else None for value in self.bid_pct_chg]
+        yield 'ask_pct_chg', [round(value, 2) if value is not None else None for value in self.ask_pct_chg]
 
 
     def update_frame(self, data):
@@ -146,16 +147,16 @@ class Frame:
         self.ask_pct_chg = [None] * 5
         if self.close is not None and self.close != Decimal('0'):
             if self.price is not None and self.price != Decimal('0'):
-                self.price_pct_chg = round((self.price - self.close) / self.close * 100, 2)
+                self.price_pct_chg = (self.price - self.close) / self.close * 100
             else:
                 self.price_pct_chg = None
             for i in range(5):
                 if self.bid_price[i] is not None and self.bid_price[i] != Decimal('0'):
-                    self.bid_pct_chg[i] = round((self.bid_price[i] - self.close) / self.close * 100, 2)
+                    self.bid_pct_chg[i] = (self.bid_price[i] - self.close) / self.close * 100
                 else:
                     self.bid_pct_chg[i] = None
                 if self.ask_price[i] is not None and self.ask_price[i] != Decimal('0'):
-                    self.ask_pct_chg[i] = round((self.ask_price[i] - self.close) / self.close * 100, 2)
+                    self.ask_pct_chg[i] = (self.ask_price[i] - self.close) / self.close * 100
                 else:
                     self.ask_pct_chg[i] = None
         else:
