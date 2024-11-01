@@ -156,8 +156,19 @@ class ConsoleManager:
         # 股票和期貨的最佳五檔及相關資訊
         self.stdscr.addstr(22, 0, "股票最佳五檔及相關數據")
         for i in range(5):
-            self.stdscr.addstr(23 + i, 0, f"買價 {i+1}: {stock_frame['bid_price'][i]} ({stock_frame['bid_pct_chg'][i]}%), 預期利潤: {state_dict['bid_expected_profit'][i]}, 溢價: {state_dict['bid_premium_pct'][i]}{self.padding}")
-            self.stdscr.addstr(28 + i, 0, f"賣價 {i+1}: {stock_frame['ask_price'][i]} ({stock_frame['ask_pct_chg'][i]}%), 預期利潤: {state_dict['ask_expected_profit'][i]}, 折價: {state_dict['ask_discount_pct'][i]}{self.padding}")
+            # 買價行，包含成交量和百分比符號
+            self.stdscr.addstr(
+                23 + i, 0,
+                f"買價 {i+1}: {stock_frame['bid_price'][i]} ({stock_frame['bid_pct_chg'][i]}%), 成交量: {stock_frame['bid_volume'][i]}, "
+                f"預期利潤: {state_dict['bid_expected_profit'][i]}, 溢價: {state_dict['bid_premium_pct'][i]}%{self.padding}"
+            )
+
+            # 賣價行，包含成交量和百分比符號
+            self.stdscr.addstr(
+                28 + i, 0,
+                f"賣價 {i+1}: {stock_frame['ask_price'][i]} ({stock_frame['ask_pct_chg'][i]}%), 成交量: {stock_frame['ask_volume'][i]}, "
+                f"預期利潤: {state_dict['ask_expected_profit'][i]}, 折價: {state_dict['ask_discount_pct'][i]}%{self.padding}"
+            )
         
         self.stdscr.addstr(33, 0, '-'*40)
 
