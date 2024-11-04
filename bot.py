@@ -202,10 +202,7 @@ async def on_ready():
         logging.error(f"Channel with ID {stream_channel_id} not found.")
     
     if webhook_channel:
-        webhook_last_message = [message async for message in webhook_channel.history(limit=1)]
-        if webhook_last_message:
-            webhook_last_message_id = webhook_last_message[0].id
-            await webhook_channel.purge(limit=100, check=lambda msg: msg.id != webhook_last_message_id)
+        await webhook_channel.purge(limit=100)
     else:
         print(f"Channel with ID {webhook_channel_id} not found.")
         logging.error(f"Channel with ID {webhook_channel_id} not found.")
