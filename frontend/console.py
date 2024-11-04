@@ -143,29 +143,32 @@ class ConsoleManager:
         right_column = 40  # Adjust based on terminal width
 
         self.stdscr.addstr(0, right_column, "股票最佳五檔及相關數據")
+        self.stdscr.addstr(1, right_column, '-'*80)
         self.stdscr.addstr(
-                1, right_column,
+                2, right_column,
                 f"現價: {stock_frame['price']} ({stock_frame['price_pct_chg']}%), 成交量: {stock_frame['volume']}, "
                 f"預期賣出利潤: {state_dict['price_sell_expected_profit']}, "
                 f"預期買入利潤: {state_dict['price_buy_expected_profit']}, "
                 f"折溢價: {state_dict['price_pod_pct']}%"
             )
+        self.stdscr.addstr(3, right_column, '-'*80)
         for i in range(5):
             # Bid price row with volume and percentage symbol
             self.stdscr.addstr(
-                2 + i, right_column,
+                4 + i, right_column,
                 f"買價 {i+1}: {stock_frame['bid_price'][i]} ({stock_frame['bid_pct_chg'][i]}%), 成交量: {stock_frame['bid_volume'][i]}, "
                 f"預期利潤: {state_dict['bid_expected_profit'][i]}, 溢價: {state_dict['bid_premium_pct'][i]}%"
             )
-
+        self.stdscr.addstr(9, right_column, '-'*80)
+        for i in range(5):
             # Ask price row with volume and percentage symbol
             self.stdscr.addstr(
-                7 + i, right_column,
+                10 + i, right_column,
                 f"賣價 {i+1}: {stock_frame['ask_price'][i]} ({stock_frame['ask_pct_chg'][i]}%), 成交量: {stock_frame['ask_volume'][i]}, "
                 f"預期利潤: {state_dict['ask_expected_profit'][i]}, 折價: {state_dict['ask_discount_pct'][i]}%"
             )
         
-        # self.stdscr.addstr(33, right_column, '-'*40)
+        self.stdscr.addstr(15, right_column, '-'*80)
 
         # Refresh terminal display
         self.stdscr.refresh()
