@@ -91,7 +91,8 @@ class State:
         self.ask_expected_profit = [None] * 5
         self.bid_premium_pct = [None] * 5
         self.ask_discount_pct = [None] * 5
-        self.price_expected_profit = None
+        self.price_buy_expected_profit = None
+        self.price_sell_expected_profit = None
         self.arbitrage = False
         if self.stock_frame.close is not None and self.future_frame.price_pct_chg is not None:
             self.expected_price = round((1 + self.future_frame.price_pct_chg * Decimal('0.01')) * self.stock_frame.close, 3)
@@ -133,18 +134,16 @@ class State:
 
         if self.stock_frame.price_pct_chg is not None and self.future_frame.price_pct_chg is not None:
             self.price_pod_pct = self.stock_frame.price_pct_chg - self.future_frame.price_pct_chg
-
-            if self.stock_frame.simtrade:
-                max_sell_volume = min(self.stock_frame.quantity, self.stock_frame.volume)
-                max_buy_volume = min(self.balance // (self.stock_frame.price * 1000), self.stock_frame.volume)
-                pre_fee_sell_profit = (self.stock_frame.price - self.expected_price - self.slippage) * 1000 * max_sell_volume
-                pre_fee_buy_profit = (self.expected_price - self.stock_frame.price - self.slippage) * 1000 * max_buy_volume
-                sell_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount + self.tax) + \
-                            self.expected_price * (self.fee * self.fee_discount)) * 1000 * max_sell_volume
-                buy_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount) + \
-                            self.expected_price * (self.fee * self.fee_discount + self.tax)) * 1000 * max_buy_volume
-                self.price_sell_expected_profit = pre_fee_sell_profit - sell_total_fee
-                self.price_buy_expected_profit = pre_fee_buy_profit - buy_total_fee
+            max_sell_volume = min(self.stock_frame.quantity, self.stock_frame.volume)
+            max_buy_volume = min(self.balance // (self.stock_frame.price * 1000), self.stock_frame.volume)
+            pre_fee_sell_profit = (self.stock_frame.price - self.expected_price - self.slippage) * 1000 * max_sell_volume
+            pre_fee_buy_profit = (self.expected_price - self.stock_frame.price - self.slippage) * 1000 * max_buy_volume
+            sell_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount + self.tax) + \
+                        self.expected_price * (self.fee * self.fee_discount)) * 1000 * max_sell_volume
+            buy_total_fee = (self.stock_frame.price * (self.fee * self.fee_discount) + \
+                        self.expected_price * (self.fee * self.fee_discount + self.tax)) * 1000 * max_buy_volume
+            self.price_sell_expected_profit = pre_fee_sell_profit - sell_total_fee
+            self.price_buy_expected_profit = pre_fee_buy_profit - buy_total_fee
         else:
             self.price_pod_pct = None
             self.price_sell_expected_profit = None
@@ -152,24 +151,34 @@ class State:
 
         max_profit = Decimal('0')
         for i in range(5):
-            if self.bid_expected_profit[i] is not None and self.bid_expected_profit[i] > max_profit and self.bid_premium_pct[i] >= self.threshold:
+            if self.bid_expected_profit[i] is not None and self.bid_expected_profit[i] > max_profit \
+                and self.bid_premium_pct[i] >= self.threshold:
+
                 max_profit = self.bid_expected_profit[i]
                 self.action = 'sell'
                 self.action_price = self.stock_frame.bid_price[i]
                 self.expected_profit = self.bid_expected_profit[i]
-            if self.ask_expected_profit[i] is not None and self.ask_expected_profit[i] > max_profit and self.ask_discount_pct[i] <= -self.threshold:
+            if self.ask_expected_profit[i] is not None and self.ask_expected_profit[i] > max_profit \
+                and self.ask_discount_pct[i] <= -self.threshold:
+
                 max_profit = self.ask_expected_profit[i]
                 self.action = 'buy'
                 self.action_price = self.stock_frame.ask_price[i]
                 self.expected_profit = self.ask_expected_profit[i]
-        if self.price_expected_profit is not None and self.price_expected_profit > max_profit:
-            if self.price_pod_pct >= self.threshold:
-                self.action = 'sell'
-                self.action_price = self.stock_frame.price - self.slippage
-            elif self.price_pod_pct <= -self.threshold:
-                self.action = 'buy'
-                self.action_price = self.stock_frame.price + self.slippage
-            self.expected_profit = self.price_expected_profit
 
+        if self.price_sell_expected_profit is not None and self.price_sell_expected_profit > max_profit \
+            and self.price_pod_pct >= self.threshold and self.stock_frame.simtrade:
+
+            max_profit = self.price_sell_expected_profit
+            self.action = 'sell'
+            self.action_price = self.stock_frame.price - self.slippage
+            self.expected_profit = self.price_sell_expected_profit
+        elif self.price_buy_expected_profit is not None and self.price_buy_expected_profit > max_profit \
+                and self.price_pod_pct <= -self.threshold and self.stock_frame.simtrade:
+            
+            max_profit = self.price_buy_expected_profit
+            self.action = 'buy'
+            self.action_price = self.stock_frame.price + self.slippage
+            self.expected_profit = self.price_buy_expected_profit
 
         
