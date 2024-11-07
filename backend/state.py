@@ -16,7 +16,7 @@ class State:
         self.price_pod_pct = None
         self.arbitrage = False
         self.expected_price = None
-        self.threshold = Decimal('0.5')
+        self.threshold = Decimal('0.6')
         self.action = None
         self.action_price = None
         self.expected_profit = None
