@@ -10,6 +10,7 @@ process = None
 
 def run_python_file():
     """運行指定的 Python 檔案"""
+    subprocess.Popen(['git', 'pull'])
     global process
     process = subprocess.Popen(['python', 'bot.py'])
     print("程式已啟動。")
