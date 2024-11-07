@@ -27,7 +27,7 @@ class State:
         self.fee = Decimal('0.001425')
         self.fee_discount = Decimal('0.2')
         self.tax = Decimal('0.001')
-        self.slippage = Decimal('0.02')
+        self.slippage = Decimal('0.03')
         self.stock_frame = Frame(api, snapshot_init=True, code=stock_code, category='stk')
         self.future_frame = Frame(api, snapshot_init=True, code=future_code, category='fop')
         self.updated_close_timestamp = None
