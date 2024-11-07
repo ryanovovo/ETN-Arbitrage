@@ -1,7 +1,7 @@
 import subprocess
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pytz import timezone
-import time
+import os
 
 # 台北時區
 tz = timezone('Asia/Taipei')
@@ -10,7 +10,7 @@ process = None
 
 def run_python_file():
     """運行指定的 Python 檔案"""
-    subprocess.Popen(['git', 'pull'])
+    os.system('git pull')
     global process
     process = subprocess.Popen(['python', 'bot.py'])
     print("程式已啟動。")
