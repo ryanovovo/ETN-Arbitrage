@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import pytz
 
 # Set up logging
-logging.basicConfig(filename='./logs/shioaji.log', level=logging.DEBUG,
+logging.basicConfig(filename='./logs/shioaji.log', level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
 
 # Initialize API and data
