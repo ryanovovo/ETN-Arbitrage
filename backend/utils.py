@@ -27,7 +27,7 @@ def get_api():
 
 
 def get_snapshot(api, code: str, category: str):
-    logging.warning(f"Fetching snapshot data for {category} {code}")
+    logging.info(f"Fetching snapshot data for {category} {code}")
     if category == 'stk':
         contract = api.Contracts.Stocks[code]
     elif category == 'fop':
