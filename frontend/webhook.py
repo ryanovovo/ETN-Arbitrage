@@ -42,7 +42,7 @@ class WebhookManager:
             if state_dict['action'] is not None:
                 return True
             return False
-        if state_dict['action'] != self.last_sent_state['action'] and state_dict['action'] is not None:
+        if state_dict['action'] != self.last_sent_state['action']:
             return True
         if state_dict['action_price'] != self.last_sent_state['action_price'] and state_dict['action_price'] is not None:
             return True
