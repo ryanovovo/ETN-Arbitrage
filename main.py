@@ -10,6 +10,7 @@ process = None
 
 def run_python_file():
     """運行指定的 Python 檔案"""
+    os.system('git checkout bot')
     os.system('git pull')
     global process
     process = subprocess.Popen(['python', 'bot.py'])
