@@ -121,7 +121,7 @@ class State:
                 if self.stock_frame.ask_price[i] is not None and self.stock_frame.ask_volume[i] is not None:
                     max_buy_volume = min(sum(self.stock_frame.ask_volume[:i+1]), self.balance // (self.stock_frame.ask_price[i] * 1000))
                     pre_fee_profit = (self.expected_price - self.stock_frame.ask_price[i]) * 1000 * max_buy_volume
-                    total_fee = (self.stock_frame.ask_price[i] * (self.fee * self.fee_discount) + \
+                    total_fee = (self.stock_frame.ask_price[i] * (self.fee * self.fee_discount) +
                                 self.expected_price * (self.fee * self.fee_discount + self.tax)) * \
                                 1000 * max_buy_volume
                     self.ask_expected_profit[i] = pre_fee_profit - total_fee
