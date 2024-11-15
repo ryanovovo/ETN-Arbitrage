@@ -4,7 +4,8 @@ import dotenv
 import logging
 from threading import RLock
 from frontend.message import state_to_embed
-from copy import deepcopy
+from datetime import datetime, timedelta
+import pytz
 class WebhookManager:
     def __init__(self):
         dotenv.load_dotenv()
@@ -36,8 +37,13 @@ class WebhookManager:
             return False, response.text
 
         return True, None
-    
+
     def need_send(self, state_dict):
+        now = datetime.now(pytz.timezone('Asia/Taipei'))
+        if now - state_dict['stock_frame']['timestamp'] > timedelta(minutes=10):
+            return False
+        if now - state_dict['future_frame']['timestamp'] > timedelta(minutes=10):
+            return False
         if self.last_sent_state is None:
             if state_dict['action'] is not None:
                 return True
