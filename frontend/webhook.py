@@ -39,11 +39,27 @@ class WebhookManager:
         return True, None
 
     def need_send(self, state_dict):
-        now = datetime.now(pytz.timezone('Asia/Taipei'))
-        if now - state_dict['stock_frame']['timestamp'] > timedelta(minutes=10):
+        tz = pytz.timezone("Asia/Taipei")
+        now = datetime.now(tz)
+
+        stock_ts = state_dict['stock_frame']['timestamp']
+        future_ts = state_dict['future_frame']['timestamp']
+
+        # 強制轉為 Asia/Taipei 時區的 tz-aware
+        if stock_ts.tzinfo is None:
+            stock_ts = tz.localize(stock_ts)
+        else:
+            stock_ts = stock_ts.astimezone(tz)
+
+        if future_ts.tzinfo is None:
+            future_ts = tz.localize(future_ts)
+        else:
+            future_ts = future_ts.astimezone(tz)
+
+        if now - stock_ts > timedelta(minutes=10):
             return False
-        if now - state_dict['future_frame']['timestamp'] > timedelta(minutes=10):
-            return False
+        if now - future_ts > timedelta(minutes=10):
+            return False 
         if self.last_sent_state is None:
             if state_dict['action'] is not None:
                 return True
