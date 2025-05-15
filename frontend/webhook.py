@@ -4,7 +4,8 @@ import dotenv
 import logging
 from threading import RLock
 from frontend.message import state_to_embed
-from copy import deepcopy
+from datetime import datetime, timedelta
+import pytz
 class WebhookManager:
     def __init__(self):
         dotenv.load_dotenv()
@@ -36,13 +37,34 @@ class WebhookManager:
             return False, response.text
 
         return True, None
-    
+
     def need_send(self, state_dict):
+        tz = pytz.timezone("Asia/Taipei")
+        now = datetime.now(tz)
+
+        stock_ts = state_dict['stock_frame']['timestamp']
+        future_ts = state_dict['future_frame']['timestamp']
+
+        # 強制轉為 Asia/Taipei 時區的 tz-aware
+        if stock_ts.tzinfo is None:
+            stock_ts = tz.localize(stock_ts)
+        else:
+            stock_ts = stock_ts.astimezone(tz)
+
+        if future_ts.tzinfo is None:
+            future_ts = tz.localize(future_ts)
+        else:
+            future_ts = future_ts.astimezone(tz)
+
+        if now - stock_ts > timedelta(minutes=10):
+            return False
+        if now - future_ts > timedelta(minutes=10):
+            return False 
         if self.last_sent_state is None:
             if state_dict['action'] is not None:
                 return True
             return False
-        if state_dict['action'] != self.last_sent_state['action'] and state_dict['action'] is not None:
+        if state_dict['action'] != self.last_sent_state['action']:
             return True
         if state_dict['action_price'] != self.last_sent_state['action_price'] and state_dict['action_price'] is not None:
             return True
