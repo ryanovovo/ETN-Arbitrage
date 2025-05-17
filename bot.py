@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 import pytz
 
 # Set up logging
+if not os.path.exists('./logs'):
+    os.makedirs('./logs')
 logging.basicConfig(filename='./logs/shioaji.log', level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
 
@@ -71,7 +73,7 @@ class StatusView(View):
         remaining_mib = round(Decimal(usage['remaining_bytes']) / 1024 / 1024, 2)
         used_pct = round(usage['bytes'] / usage['limit_bytes'] * 100, 2)
         unused_pct = round(Decimal(100 - used_pct), 2)
-        
+
         # Create an embed message
         if unused_pct >= 50:
             color = discord.Color.green()
@@ -172,7 +174,7 @@ class StreamView(View):
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    
+
     # Specify the channel to send messages
     global channel_id, stream_channel_id
     webhook_channel_id = int(os.getenv('WEBHOOK_CHANNEL_ID'))
@@ -180,7 +182,7 @@ async def on_ready():
     bot_channel = bot.get_channel(channel_id)
     stream_channel = bot.get_channel(stream_channel_id)
     webhook_channel = bot.get_channel(webhook_channel_id)
-    
+
     if bot_channel:
         await bot_channel.purge(limit=100)  # Clear messages on startup
         status_view = StatusView()
@@ -190,7 +192,7 @@ async def on_ready():
     else:
         print(f"Channel with ID {channel_id} not found.")
         logging.error(f"Channel with ID {channel_id} not found.")
-    
+
     if stream_channel:
         await stream_channel.purge(limit=100)  # Clear messages on startup
         stream_view = StreamView()
@@ -200,7 +202,7 @@ async def on_ready():
     else:
         print(f"Channel with ID {stream_channel_id} not found.")
         logging.error(f"Channel with ID {stream_channel_id} not found.")
-    
+
     if webhook_channel:
         await webhook_channel.purge(limit=100)
     else:
